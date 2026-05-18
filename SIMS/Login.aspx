@@ -77,6 +77,14 @@
                     CssClass="primary-btn"
                     OnClick="btnLogin_Click" />
 
+                <div style="margin-top:18px; text-align:center;">
+
+                <a href="ForgotPassword.aspx"
+                  style="text-decoration:none; color:#6366f1; font-weight:600;">
+                  Forgot Password?
+                </a>
+                 </div>
+
                 <!-- Error Message -->
                 <asp:Label ID="lblMessage"
                     runat="server"

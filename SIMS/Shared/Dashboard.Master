@@ -1,0 +1,126 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Dashboard.Master.cs" Inherits="SIMS.Shared.Dashboard" %>
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head runat="server">
+
+    <title>SIMS Dashboard</title>
+
+    <!-- CSS -->
+    <link href="../Assets/CSS/global.css" rel="stylesheet" />
+    <link href="../Assets/CSS/dashboard.css" rel="stylesheet" />
+    <link href="../Assets/CSS/sidebar.css" rel="stylesheet" />
+    <link href="../Assets/CSS/components.css" rel="stylesheet" />
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+
+</head>
+
+<body>
+
+    <form id="form1" runat="server">
+
+        <div class="dashboard-layout">
+
+            <!-- SIDEBAR -->
+            <aside class="sidebar glass-card">
+
+                <div class="logo-section">
+
+                    <h2 class="logo-text">
+                        SIMS
+                    </h2>
+
+                </div>
+
+                <nav class="sidebar-nav">
+
+                    <a href="#" class="nav-item active">
+                        Dashboard
+                    </a>
+
+                    <a href="#" class="nav-item">
+                        Students
+                    </a>
+
+                    <a href="#" class="nav-item">
+                        Lecturers
+                    </a>
+
+                    <a href="#" class="nav-item">
+                        Courses
+                    </a>
+
+                    <a href="#" class="nav-item">
+                        Reports
+                    </a>
+
+                    <a href="#" class="nav-item">
+                        Settings
+                    </a>
+
+                </nav>
+
+                <div class="sidebar-footer">
+
+                    <asp:Button ID="btnLogout"
+                        runat="server"
+                        Text="Logout"
+                        CssClass="logout-btn"
+                        OnClick="btnLogout_Click" />
+
+                </div>
+
+            </aside>
+
+            <!-- MAIN CONTENT -->
+            <main class="main-content">
+
+                <!-- TOPBAR -->
+                <div class="topbar glass-card">
+
+                    <div>
+
+                        <h1 class="page-title">
+                            Dashboard
+                        </h1>
+
+                        <p class="page-subtitle">
+                            Welcome back to SIMS
+                        </p>
+
+                    </div>
+
+                    <div class="profile-box">
+
+                        <div class="profile-avatar">
+                            R
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- PAGE CONTENT -->
+                <div class="page-content">
+
+                    <asp:ContentPlaceHolder ID="MainContent"
+                        runat="server">
+
+                    </asp:ContentPlaceHolder>
+
+                </div>
+
+            </main>
+
+        </div>
+
+    </form>
+
+</body>
+
+</html>

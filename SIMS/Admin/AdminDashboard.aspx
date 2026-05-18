@@ -1,25 +1,23 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="AdminDashboard.aspx.cs" Inherits="SIMS.Admin.AdminDashboard" %>
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Shared/Dashboard.Master"
+    AutoEventWireup="true"
+    CodeBehind="AdminDashboard.aspx.cs"
+    Inherits="SIMS.Admin.AdminDashboard" %>
 
-<!DOCTYPE html>
+<asp:Content ID="Content1"
+    ContentPlaceHolderID="MainContent"
+    runat="server">
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head runat="server">
-    <title>Admin Dashboard</title>
-</head>
-<body>
+    <div class="glass-card"
+        style="padding:30px; border-radius:24px;">
 
-    <form id="form1" runat="server">
-
-        <h1>
+        <h2>
             Welcome Admin
-        </h1>
+        </h2>
 
-        <asp:Button ID="btnLogout"
-            runat="server"
-            Text="Logout"
-            OnClick="btnLogout_Click" />
+        <p>
+            Glassmorphism dashboard successfully connected.
+        </p>
 
-    </form>
+    </div>
 
-</body>
-</html>
+</asp:Content>

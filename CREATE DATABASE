@@ -1,0 +1,131 @@
+USE SIMS_DB;
+
+---------------------------------------------------
+-- USERS TABLE
+---------------------------------------------------
+
+CREATE TABLE Users
+(
+    userID INT PRIMARY KEY IDENTITY(1,1),
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password VARCHAR(100) NOT NULL,
+    role VARCHAR(20) NOT NULL
+);
+
+---------------------------------------------------
+-- STUDENTS TABLE
+---------------------------------------------------
+
+CREATE TABLE Students
+(
+    studentID INT PRIMARY KEY IDENTITY(1,1),
+    userID INT UNIQUE,
+    phone VARCHAR(20),
+    gender VARCHAR(10),
+    dateOfBirth DATE,
+    address VARCHAR(255),
+
+    FOREIGN KEY (userID)
+    REFERENCES Users(userID)
+);
+
+---------------------------------------------------
+-- LECTURERS TABLE
+---------------------------------------------------
+
+CREATE TABLE Lecturers
+(
+    lecturerID INT PRIMARY KEY IDENTITY(1,1),
+    userID INT UNIQUE,
+    department VARCHAR(100),
+    qualification VARCHAR(100),
+    phone VARCHAR(20),
+
+    FOREIGN KEY (userID)
+    REFERENCES Users(userID)
+);
+
+---------------------------------------------------
+-- COURSES TABLE
+---------------------------------------------------
+
+CREATE TABLE Courses
+(
+    courseID INT PRIMARY KEY IDENTITY(1,1),
+    courseName VARCHAR(100) NOT NULL,
+    description VARCHAR(255),
+    credits INT,
+    lecturerID INT,
+
+    FOREIGN KEY (lecturerID)
+    REFERENCES Lecturers(lecturerID)
+);
+
+---------------------------------------------------
+-- ENROLMENTS TABLE
+---------------------------------------------------
+
+CREATE TABLE Enrolments
+(
+    enrolmentID INT PRIMARY KEY IDENTITY(1,1),
+    studentID INT,
+    courseID INT,
+    enrolDate DATE DEFAULT GETDATE(),
+
+    FOREIGN KEY (studentID)
+    REFERENCES Students(studentID),
+
+    FOREIGN KEY (courseID)
+    REFERENCES Courses(courseID)
+);
+
+---------------------------------------------------
+-- ATTENDANCE TABLE
+---------------------------------------------------
+
+CREATE TABLE Attendance
+(
+    attendanceID INT PRIMARY KEY IDENTITY(1,1),
+    studentID INT,
+    courseID INT,
+    attendanceDate DATE,
+    status VARCHAR(20),
+
+    FOREIGN KEY (studentID)
+    REFERENCES Students(studentID),
+
+    FOREIGN KEY (courseID)
+    REFERENCES Courses(courseID)
+);
+
+---------------------------------------------------
+-- MARKS TABLE
+---------------------------------------------------
+
+CREATE TABLE Marks
+(
+    markID INT PRIMARY KEY IDENTITY(1,1),
+    studentID INT,
+    courseID INT,
+    score DECIMAL(5,2),
+    remarks VARCHAR(255),
+
+    FOREIGN KEY (studentID)
+    REFERENCES Students(studentID),
+
+    FOREIGN KEY (courseID)
+    REFERENCES Courses(courseID)
+);
+
+---------------------------------------------------
+-- ANNOUNCEMENTS TABLE
+---------------------------------------------------
+
+CREATE TABLE Announcements
+(
+    announcementID INT PRIMARY KEY IDENTITY(1,1),
+    title VARCHAR(200),
+    message VARCHAR(MAX),
+    datePosted DATE DEFAULT GETDATE()
+);

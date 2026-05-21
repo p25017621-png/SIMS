@@ -6,18 +6,27 @@ namespace SIMS.Lecturer
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (Session["role"] == null || Session["role"].ToString() != "Lecturer")
-            {
-                Response.Redirect("~/Login.aspx");
-            }
+
         }
 
-        protected void btnLogout_Click(object sender, EventArgs e)
+        protected void btnAttendance_Click(object sender, EventArgs e)
         {
-            Session.Clear();
-            Session.Abandon();
+            Response.Redirect("ManageAttendance.aspx");
+        }
 
-            Response.Redirect("~/Login.aspx");
+        protected void btnMarks_Click(object sender, EventArgs e)
+        {
+            Response.Redirect("ManageMarks.aspx");
+        }
+
+        protected void btnStudents_Click(object sender, EventArgs e)
+        {
+            Response.Redirect("ViewStudents.aspx");
+        }
+
+        protected void btnProfile_Click(object sender, EventArgs e)
+        {
+            Response.Redirect("ManageProfile.aspx");
         }
     }
 }

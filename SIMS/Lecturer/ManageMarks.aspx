@@ -10,8 +10,6 @@ Inherits="SIMS.Lecturer.ManageMarks" %>
 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet" />
-
     <style>
 
         *{
@@ -22,70 +20,16 @@ Inherits="SIMS.Lecturer.ManageMarks" %>
         }
 
         body{
-
             background:
             linear-gradient(135deg,#faf7ff,#f3eeff,#ffffff);
 
             min-height:100vh;
-
-            overflow:hidden;
-
-            position:relative;
+            overflow-y:auto;
         }
-
-        /* BLUR PURPLE BACKGROUND */
-
-        body::before{
-
-            content:'';
-
-            position:absolute;
-
-            width:420px;
-            height:420px;
-
-            background:#8f7cff;
-
-            border-radius:50%;
-
-            top:-140px;
-            left:-140px;
-
-            filter:blur(120px);
-
-            opacity:0.22;
-
-            z-index:-1;
-        }
-
-        body::after{
-
-            content:'';
-
-            position:absolute;
-
-            width:350px;
-            height:350px;
-
-            background:#6C63FF;
-
-            border-radius:50%;
-
-            bottom:-130px;
-            right:-130px;
-
-            filter:blur(120px);
-
-            opacity:0.18;
-
-            z-index:-1;
-        }
-
-        /* MAIN LAYOUT */
 
         .main-container{
             display:flex;
-            height:100vh;
+            min-height:100vh;
         }
 
         /* SIDEBAR */
@@ -94,18 +38,12 @@ Inherits="SIMS.Lecturer.ManageMarks" %>
 
             width:240px;
 
-            background:
-            rgba(255,255,255,0.55);
-
-            backdrop-filter:blur(18px);
+            background:white;
 
             border-right:
-            1px solid rgba(255,255,255,0.4);
+            2px solid #d9ccff;
 
             padding:35px 25px;
-
-            box-shadow:
-            0 10px 30px rgba(108,99,255,0.08);
         }
 
         .logo{
@@ -151,9 +89,6 @@ Inherits="SIMS.Lecturer.ManageMarks" %>
             linear-gradient(135deg,#6C63FF,#8E7BFF);
 
             color:white !important;
-
-            box-shadow:
-            0 10px 20px rgba(108,99,255,0.25);
         }
 
         /* CONTENT */
@@ -163,20 +98,11 @@ Inherits="SIMS.Lecturer.ManageMarks" %>
             flex:1;
 
             padding:35px 50px;
-
-            overflow-y:auto;
-        }
-
-        .topbar{
-
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
         }
 
         .page-title{
 
-            font-size:54px;
+            font-size:52px;
             font-weight:700;
             color:#222;
         }
@@ -184,116 +110,39 @@ Inherits="SIMS.Lecturer.ManageMarks" %>
         .page-subtitle{
 
             color:#888;
-
-            margin-top:6px;
+            margin-top:8px;
+            margin-bottom:35px;
         }
 
-        .profile{
-
-            width:58px;
-            height:58px;
-
-            border-radius:50%;
-
-            background:
-            linear-gradient(135deg,#6C63FF,#8E7BFF);
-
-            display:flex;
-            justify-content:center;
-            align-items:center;
-
-            color:white;
-
-            font-weight:600;
-
-            box-shadow:
-            0 10px 20px rgba(108,99,255,0.25);
-        }
-
-        /* MAIN CARD */
+        /* CARD */
 
         .marks-card{
 
-            margin-top:40px;
-
             width:100%;
-            max-width:850px;
+            max-width:1000px;
 
-            background:
-            rgba(255,255,255,0.60);
-
-            backdrop-filter:blur(18px);
+            background:white;
 
             border-radius:30px;
 
             padding:40px;
 
             border:
-            1px solid rgba(255,255,255,0.4);
+            2px solid #d9ccff;
 
             box-shadow:
             0 12px 35px rgba(108,99,255,0.12);
-
-            animation:fadeUp 0.6s ease;
         }
-
-        .card-header{
-
-            display:flex;
-            align-items:center;
-
-            gap:18px;
-
-            margin-bottom:35px;
-        }
-
-        .icon-box{
-
-            width:75px;
-            height:75px;
-
-            border-radius:22px;
-
-            background:
-            linear-gradient(135deg,#6C63FF,#8E7BFF);
-
-            display:flex;
-            justify-content:center;
-            align-items:center;
-
-            color:white;
-
-            font-size:30px;
-
-            box-shadow:
-            0 12px 25px rgba(108,99,255,0.25);
-        }
-
-        .card-title{
-
-            font-size:38px;
-            font-weight:700;
-            color:#222;
-        }
-
-        .card-subtitle{
-
-            color:#888;
-
-            margin-top:5px;
-        }
-
-        /* FORM */
 
         .input-group{
-            margin-bottom:28px;
+            margin-bottom:25px;
         }
 
         .input-group label{
 
             display:block;
 
-            margin-bottom:12px;
+            margin-bottom:10px;
 
             color:#555;
 
@@ -304,43 +153,32 @@ Inherits="SIMS.Lecturer.ManageMarks" %>
 
             width:100%;
 
-            padding:16px 18px;
+            padding:16px;
 
-            border:none;
+            border:
+            2px solid #e5dcff;
 
-            border-radius:16px;
-
-            background:#ffffff;
-
-            font-size:15px;
-
-            color:#333;
+            border-radius:14px;
 
             outline:none;
 
-            margin-top:8px;
-
-            box-shadow:
-            0 6px 18px rgba(108,99,255,0.12);
-
-            transition:0.3s ease;
+            font-size:15px;
         }
 
         .input-box:focus{
 
-            box-shadow:
-            0 0 0 4px rgba(108,99,255,0.18);
-
-            transform:translateY(-2px);
+            border-color:#6C63FF;
         }
 
         /* BUTTON */
 
         .btn-save{
 
+            margin-top:10px;
+
             width:220px;
 
-            padding:16px;
+            padding:15px;
 
             border:none;
 
@@ -355,34 +193,63 @@ Inherits="SIMS.Lecturer.ManageMarks" %>
             font-weight:600;
 
             cursor:pointer;
-
-            transition:0.3s ease;
-
-            box-shadow:
-            0 10px 20px rgba(108,99,255,0.22);
         }
 
-        .btn-save:hover{
+        /* TABLE */
 
-            transform:translateY(-3px);
-
-            box-shadow:
-            0 15px 28px rgba(108,99,255,0.30);
+        table{
+            width:100%;
+            border-collapse:separate;
+            border-spacing:0;
+            overflow:hidden;
+            border-radius:20px;
+            background:white;
+            box-shadow:0 8px 20px rgba(128,0,255,0.08);
+            border:2px solid #d9ccff;
+            margin-top:35px;
         }
 
-        /* ANIMATION */
+        th{
 
-        @keyframes fadeUp{
+            background:
+            linear-gradient(90deg,#7b5cff,#9b7bff);
 
-            from{
-                opacity:0;
-                transform:translateY(25px);
-            }
+            color:white;
 
-            to{
-                opacity:1;
-                transform:translateY(0);
-            }
+            padding:18px;
+
+            text-align:left;
+
+            font-size:15px;
+        }
+
+        th:first-child{
+            border-top-left-radius:18px;
+        }
+
+        th:last-child{
+            border-top-right-radius:18px;
+        }
+
+        td{
+
+            padding:18px;
+
+            border-top:
+            1px solid #eee;
+
+            color:#555;
+
+            font-size:15px;
+
+            background:white;
+        }
+
+        tr:hover td{
+
+            background:#faf7ff;
+
+            transition:0.3s;
         }
 
     </style>
@@ -433,49 +300,28 @@ Inherits="SIMS.Lecturer.ManageMarks" %>
 
     <div class="content">
 
-        <!-- TOP -->
-
-        <div class="topbar">
-
-            <div>
-
-                <div class="page-title">
-                    Manage Marks
-                </div>
-
-                <div class="page-subtitle">
-                    Update coursework and final exam marks
-                </div>
-
-            </div>
-
-            <div class="profile">
-                R
-            </div>
-
+        <div class="page-title">
+            Manage Marks
         </div>
 
-        <!-- CARD -->
+        <div class="page-subtitle">
+            Update coursework and final exam marks
+        </div>
 
         <div class="marks-card">
 
-            <div class="card-header">
+            <!-- STUDENT ID -->
 
-                <div class="icon-box">
-                    <i class="fa-solid fa-chart-column"></i>
-                </div>
+            <div class="input-group">
 
-                <div>
+                <label>Student ID</label>
 
-                    <div class="card-title">
-                        Student Marks
-                    </div>
-
-                    <div class="card-subtitle">
-                        Enter and update student marks easily
-                    </div>
-
-                </div>
+                <asp:TextBox
+                ID="txtStudentID"
+                runat="server"
+                CssClass="input-box"
+                placeholder="Enter student ID">
+                </asp:TextBox>
 
             </div>
 
@@ -530,7 +376,18 @@ Inherits="SIMS.Lecturer.ManageMarks" %>
             ID="btnUpdate"
             runat="server"
             Text="Update Marks"
-            CssClass="btn-save" />
+            CssClass="btn-save"
+            OnClick="btnUpdate_Click" />
+
+            <!-- GRIDVIEW -->
+
+            <asp:GridView
+            ID="GridView1"
+            runat="server"
+            Width="100%"
+            AutoGenerateColumns="true"
+            GridLines="None">
+            </asp:GridView>
 
         </div>
 

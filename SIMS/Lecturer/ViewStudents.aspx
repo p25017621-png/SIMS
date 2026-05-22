@@ -18,192 +18,139 @@
         body{
             background:linear-gradient(135deg,#f7f3ff,#efe7ff);
             min-height:100vh;
-            overflow-x:auto;
-            position:relative;
-        }
-
-        /* Animated Background */
-
-        .bg-circle{
-            position:absolute;
-            border-radius:50%;
-            background:rgba(123,92,255,0.12);
-            animation:float 6s infinite ease-in-out;
-            z-index:0;
-        }
-
-        .circle1{
-            width:220px;
-            height:220px;
-            top:40px;
-            left:50px;
-        }
-
-        .circle2{
-            width:180px;
-            height:180px;
-            bottom:60px;
-            right:100px;
-            animation-delay:2s;
-        }
-
-        .circle3{
-            width:120px;
-            height:120px;
-            top:280px;
-            right:250px;
-            animation-delay:4s;
-        }
-
-        @keyframes float{
-            0%{
-                transform:translateY(0px);
-            }
-
-            50%{
-                transform:translateY(-20px);
-            }
-
-            100%{
-                transform:translateY(0px);
-            }
+            overflow-x:hidden;
         }
 
         .container{
             display:flex;
             min-height:100vh;
-            position:relative;
-            z-index:1;
         }
 
-        /* Sidebar */
+        /* SIDEBAR */
 
         .sidebar{
-            width:250px;
-            background:rgba(255,255,255,0.4);
-            backdrop-filter:blur(20px);
-            padding:40px 25px;
-            box-shadow:0 10px 25px rgba(128,0,255,0.08);
+            width:240px;
+            background:white;
+            padding:35px 20px;
+            box-shadow:0 0 20px rgba(0,0,0,0.05);
         }
 
         .logo{
-            font-size:45px;
+            font-size:48px;
             font-weight:700;
-            color:#7b5cff;
+            color:#6C63FF;
             margin-bottom:50px;
         }
 
+        .menu{
+            display:flex;
+            flex-direction:column;
+            gap:15px;
+        }
+
         .menu a{
-            display:block;
-            padding:16px 20px;
-            margin-bottom:15px;
-            border-radius:16px;
             text-decoration:none;
+            padding:15px;
+            border-radius:14px;
             color:#555;
-            font-size:17px;
             transition:0.3s;
         }
 
         .menu a:hover{
-            background:linear-gradient(90deg,#7b5cff,#9b7bff);
-            color:white;
+            background:#eee9ff;
+            color:#6C63FF;
         }
 
         .active{
-            background:linear-gradient(90deg,#7b5cff,#9b7bff);
+            background:linear-gradient(135deg,#6C63FF,#8E7BFF);
             color:white !important;
         }
 
-        /* Main Content */
+        /* MAIN */
 
         .main{
             flex:1;
-            padding:30px 40px;
+            padding:40px;
         }
 
         .title{
-            font-size:45px;
+            font-size:50px;
             font-weight:700;
-            color:#111;
+            color:#222;
         }
 
         .subtitle{
-            color:#999;
+            color:#888;
             margin-top:10px;
             margin-bottom:40px;
-            font-size:18px;
         }
+
+        /* CARD */
 
         .card{
-            background:rgba(255,255,255,0.4);
-            backdrop-filter:blur(18px);
-            border-radius:30px;
-            padding:35px;
-            box-shadow:0 10px 35px rgba(128,0,255,0.12);
+            background:white;
+            border-radius:25px;
+            padding:30px;
+            box-shadow:0 10px 30px rgba(0,0,0,0.05);
         }
 
-        .top-section{
+        .card-top{
             display:flex;
             align-items:center;
             margin-bottom:30px;
         }
 
         .icon{
-            width:85px;
-            height:85px;
-            background:linear-gradient(135deg,#7b5cff,#9b7bff);
-            border-radius:25px;
+            width:80px;
+            height:80px;
+            background:linear-gradient(135deg,#6C63FF,#8E7BFF);
+            border-radius:20px;
             display:flex;
             justify-content:center;
             align-items:center;
-            font-size:40px;
             color:white;
+            font-size:35px;
             margin-right:20px;
-            box-shadow:0 8px 20px rgba(123,92,255,0.3);
         }
 
-        .top-section h2{
-            font-size:42px;
+        .card-top h2{
+            font-size:35px;
             color:#222;
         }
 
-        .top-section p{
+        .card-top p{
             color:#888;
-            margin-top:8px;
-            font-size:17px;
+            margin-top:5px;
         }
+
+        /* TABLE */
 
         table{
             width:100%;
             border-collapse:collapse;
             overflow:hidden;
-            border-radius:20px;
-            background:white;
-            box-shadow:0 8px 20px rgba(128,0,255,0.08);
+            border-radius:18px;
         }
 
         th{
-            background:linear-gradient(90deg,#7b5cff,#9b7bff);
+            background:linear-gradient(135deg,#6C63FF,#8E7BFF);
             color:white;
             padding:18px;
             text-align:left;
-            font-size:15px;
         }
 
         td{
             padding:18px;
             border-bottom:1px solid #eee;
             color:#555;
-            font-size:15px;
         }
 
         tr:hover{
-            background:#faf7ff;
-            transition:0.3s;
+            background:#faf8ff;
         }
 
         .course{
-            color:#6c4cff;
+            color:#6C63FF;
             font-weight:600;
         }
 
@@ -213,113 +160,120 @@
 
 <body>
 
-    <!-- Background Animation -->
+<form id="form1" runat="server">
 
-    <div class="bg-circle circle1"></div>
-    <div class="bg-circle circle2"></div>
-    <div class="bg-circle circle3"></div>
+<div class="container">
 
-    <form id="form1" runat="server">
+    <!-- SIDEBAR -->
 
-        <div class="container">
+    <div class="sidebar">
 
-            <!-- Sidebar -->
+        <div class="logo">
+            SIMS
+        </div>
 
-            <div class="sidebar">
+        <div class="menu">
 
-                <div class="logo">SIMS</div>
+            <a href="LecturerDashboard.aspx">
+                Dashboard
+            </a>
 
-                <div class="menu">
+            <a href="ManageAttendance.aspx">
+                Attendance
+            </a>
 
-                    <a href="LecturerDashboard.aspx">Dashboard</a>
+            <a href="ManageMarks.aspx">
+                Marks
+            </a>
 
-                    <a href="ManageAttendance.aspx">Attendance</a>
+            <a href="ViewStudents.aspx" class="active">
+                Students
+            </a>
 
-                    <a href="ManageMarks.aspx">Marks</a>
-
-                    <a class="active" href="ViewStudents.aspx">Students</a>
-
-                    <a href="ManageProfile.aspx">Profile</a>
-
-                </div>
-
-            </div>
-
-            <!-- Main Content -->
-
-            <div class="main">
-
-                <h1 class="title">Student List</h1>
-
-                <p class="subtitle">
-                    View all registered students
-                </p>
-
-                <div class="card">
-
-                    <div class="top-section">
-
-                        <div class="icon">🎓</div>
-
-                        <div>
-
-                            <h2>Students Information</h2>
-
-                            <p>
-                                Manage and monitor student records easily
-                            </p>
-
-                        </div>
-
-                    </div>
-
-                    <table>
-
-                        <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Course</th>
-                            <th>Coursework</th>
-                            <th>Final Exam</th>
-                        </tr>
-
-                        <tr>
-                            <td>ST001</td>
-                            <td>John Tan</td>
-                            <td>john@gmail.com</td>
-                            <td class="course">Computer Science</td>
-                            <td>25</td>
-                            <td>60</td>
-                        </tr>
-
-                        <tr>
-                            <td>ST002</td>
-                            <td>Sarah Lim</td>
-                            <td>sarah@gmail.com</td>
-                            <td class="course">Software Engineering</td>
-                            <td>28</td>
-                            <td>55</td>
-                        </tr>
-
-                        <tr>
-                            <td>ST003</td>
-                            <td>Daniel Wong</td>
-                            <td>daniel@gmail.com</td>
-                            <td class="course">Information Technology</td>
-                            <td>30</td>
-                            <td>65</td>
-                        </tr>
-
-                    </table>
-
-                </div>
-
-            </div>
+            <a href="ManageProfile.aspx">
+                Profile
+            </a>
 
         </div>
 
-    </form>
+    </div>
+
+    <!-- MAIN -->
+
+    <div class="main">
+
+        <div class="title">
+            Student List
+        </div>
+
+        <div class="subtitle">
+            View all registered students
+        </div>
+
+        <div class="card">
+
+            <div class="card-top">
+
+                <div class="icon">
+                    🎓
+                </div>
+
+                <div>
+
+                    <h2>Students Information</h2>
+
+                    <p>
+                        Manage and monitor student records easily
+                    </p>
+
+                </div>
+
+            </div>
+
+            <!-- TABLE -->
+
+            <table>
+
+                <tr>
+
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Course</th>
+
+                </tr>
+
+                <asp:Repeater ID="rptStudents" runat="server">
+
+                    <ItemTemplate>
+
+                        <tr>
+
+                            <td><%# Eval("StudentID") %></td>
+
+                            <td><%# Eval("StudentName") %></td>
+
+                            <td><%# Eval("Email") %></td>
+
+                            <td class="course">
+                                <%# Eval("Course") %>
+                            </td>
+
+                        </tr>
+
+                    </ItemTemplate>
+
+                </asp:Repeater>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+</form>
 
 </body>
 </html>

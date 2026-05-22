@@ -24,60 +24,12 @@ Inherits="SIMS.Lecturer.ManageAttendance" %>
             linear-gradient(135deg,#f5f1ff,#ece5ff,#f8f6ff);
 
             min-height:100vh;
-
-            overflow:hidden;
-
-            position:relative;
-        }
-
-        body::before{
-            content:'';
-
-            position:absolute;
-
-            width:450px;
-            height:450px;
-
-            background:#8c7bff;
-
-            border-radius:50%;
-
-            top:-180px;
-            left:-180px;
-
-            filter:blur(140px);
-
-            opacity:0.30;
-
-            z-index:-1;
-        }
-
-        body::after{
-            content:'';
-
-            position:absolute;
-
-            width:400px;
-            height:400px;
-
-            background:#6c63ff;
-
-            border-radius:50%;
-
-            bottom:-180px;
-            right:-180px;
-
-            filter:blur(140px);
-
-            opacity:0.20;
-
-            z-index:-1;
         }
 
         .main-container{
             display:flex;
             width:100%;
-            height:100vh;
+            min-height:100vh;
         }
 
         /* SIDEBAR */
@@ -86,22 +38,16 @@ Inherits="SIMS.Lecturer.ManageAttendance" %>
 
             width:240px;
 
-            background:
-            rgba(255,255,255,0.55);
-
-            backdrop-filter:blur(18px);
+            background:white;
 
             padding:35px 25px;
 
-            border-right:
-            1px solid rgba(255,255,255,0.4);
-
             box-shadow:
-            0 10px 30px rgba(108,99,255,0.08);
+            0 0 20px rgba(0,0,0,0.05);
         }
 
         .logo{
-            font-size:46px;
+            font-size:48px;
             font-weight:700;
             color:#6C63FF;
             margin-bottom:50px;
@@ -117,19 +63,17 @@ Inherits="SIMS.Lecturer.ManageAttendance" %>
 
             text-decoration:none;
 
-            padding:16px 18px;
+            padding:15px;
 
             border-radius:14px;
 
             color:#555;
 
-            font-weight:500;
-
-            transition:0.3s ease;
+            transition:0.3s;
         }
 
         .menu a:hover{
-            background:#ede9ff;
+            background:#eee9ff;
             color:#6C63FF;
         }
 
@@ -138,138 +82,60 @@ Inherits="SIMS.Lecturer.ManageAttendance" %>
             linear-gradient(135deg,#6C63FF,#8E7BFF);
 
             color:white !important;
-
-            box-shadow:
-            0 10px 20px rgba(108,99,255,0.25);
         }
 
         /* CONTENT */
 
         .content{
-
             flex:1;
-
-            padding:35px;
-
-            overflow-y:auto;
-        }
-
-        .topbar{
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
+            padding:40px;
         }
 
         .page-title{
-            font-size:52px;
+            font-size:50px;
             font-weight:700;
             color:#222;
         }
 
         .page-subtitle{
             color:#888;
-            margin-top:8px;
+            margin-top:10px;
+            margin-bottom:40px;
         }
-
-        .profile{
-
-            width:60px;
-            height:60px;
-
-            border-radius:50%;
-
-            background:
-            linear-gradient(135deg,#6C63FF,#8E7BFF);
-
-            display:flex;
-            justify-content:center;
-            align-items:center;
-
-            color:white;
-
-            font-weight:600;
-
-            box-shadow:
-            0 10px 20px rgba(108,99,255,0.25);
-        }
-
-        /* SEARCH */
-
-        .search-box{
-
-            margin-top:35px;
-
-            width:320px;
-
-            position:relative;
-        }
-
-        .search-box input{
-
-            width:100%;
-
-            padding:15px 18px 15px 48px;
-
-            border:none;
-
-            border-radius:16px;
-
-            background:
-            rgba(255,255,255,0.75);
-
-            backdrop-filter:blur(10px);
-
-            font-size:15px;
-
-            box-shadow:
-            0 8px 20px rgba(108,99,255,0.08);
-
-            outline:none;
-        }
-
-        .search-box i{
-
-            position:absolute;
-
-            top:16px;
-            left:18px;
-
-            color:#6C63FF;
-        }
-
-        /* TABLE CARD */
 
         .table-card{
 
-            margin-top:35px;
+            background:white;
 
-            background:
-            rgba(255,255,255,0.65);
+            border-radius:25px;
 
-            backdrop-filter:blur(18px);
-
-            border-radius:28px;
-
-            padding:30px;
+            padding:35px;
 
             box-shadow:
-            0 12px 35px rgba(108,99,255,0.12);
+            0 10px 30px rgba(0,0,0,0.05);
 
             border:
-            1px solid rgba(255,255,255,0.4);
-
-            animation:fadeUp 0.6s ease;
+            2px solid #d9ccff;
         }
+
+        /* TABLE */
 
         table{
             width:100%;
-            border-collapse:collapse;
+            border-collapse:separate;
+            border-spacing:0;
+            overflow:hidden;
+            border-radius:20px;
+            background:white;
+            box-shadow:0 8px 20px rgba(128,0,255,0.08);
+            border:2px solid #d9ccff;
+            margin-top:20px;
         }
 
         th{
 
             background:
-            linear-gradient(135deg,#6C63FF,#8E7BFF);
+            linear-gradient(90deg,#7b5cff,#9b7bff);
 
             color:white;
 
@@ -280,26 +146,23 @@ Inherits="SIMS.Lecturer.ManageAttendance" %>
             font-size:15px;
         }
 
-        th:first-child{
-            border-top-left-radius:14px;
-        }
-
-        th:last-child{
-            border-top-right-radius:14px;
-        }
-
         td{
 
-            padding:20px 18px;
+            padding:18px;
+
+            border-top:
+            1px solid #eee;
 
             color:#555;
 
-            border-bottom:
-            1px solid #eee;
+            font-size:15px;
         }
 
-        tr:hover{
-            background:#faf8ff;
+        tr:hover td{
+
+            background:#faf7ff;
+
+            transition:0.3s;
         }
 
         select{
@@ -313,19 +176,17 @@ Inherits="SIMS.Lecturer.ManageAttendance" %>
             background:#f2efff;
 
             color:#555;
-
-            outline:none;
         }
 
         .save-btn{
 
-            margin-top:28px;
+            margin-top:25px;
 
             padding:15px 30px;
 
             border:none;
 
-            border-radius:16px;
+            border-radius:14px;
 
             background:
             linear-gradient(135deg,#6C63FF,#8E7BFF);
@@ -335,32 +196,14 @@ Inherits="SIMS.Lecturer.ManageAttendance" %>
             font-weight:600;
 
             cursor:pointer;
-
-            transition:0.3s ease;
-
-            box-shadow:
-            0 10px 20px rgba(108,99,255,0.20);
         }
 
         .save-btn:hover{
-
-            transform:translateY(-3px);
-
-            box-shadow:
-            0 14px 25px rgba(108,99,255,0.30);
+            opacity:0.9;
         }
 
-        @keyframes fadeUp{
-
-            from{
-                opacity:0;
-                transform:translateY(25px);
-            }
-
-            to{
-                opacity:1;
-                transform:translateY(0);
-            }
+        .grid{
+            margin-top:30px;
         }
 
     </style>
@@ -411,40 +254,13 @@ Inherits="SIMS.Lecturer.ManageAttendance" %>
 
     <div class="content">
 
-        <div class="topbar">
-
-            <div>
-
-                <div class="page-title">
-                    Manage Attendance
-                </div>
-
-                <div class="page-subtitle">
-                    Update and manage student attendance records
-                </div>
-
-            </div>
-
-            <div class="profile">
-                R
-            </div>
-
+        <div class="page-title">
+            Manage Attendance
         </div>
 
-        <!-- SEARCH -->
-
-        <div class="search-box">
-
-            <i class="fa-solid fa-magnifying-glass"></i>
-
-            <asp:TextBox
-            ID="txtSearch"
-            runat="server"
-            placeholder="Search Student"></asp:TextBox>
-
+        <div class="page-subtitle">
+            Update and manage student attendance records
         </div>
-
-        <!-- TABLE -->
 
         <div class="table-card">
 
@@ -458,6 +274,7 @@ Inherits="SIMS.Lecturer.ManageAttendance" %>
                 </tr>
 
                 <tr>
+
                     <td>ST001</td>
                     <td>John Tan</td>
                     <td>Computer Science</td>
@@ -472,9 +289,11 @@ Inherits="SIMS.Lecturer.ManageAttendance" %>
                         </asp:DropDownList>
 
                     </td>
+
                 </tr>
 
                 <tr>
+
                     <td>ST002</td>
                     <td>Sarah Lim</td>
                     <td>Software Engineering</td>
@@ -489,6 +308,45 @@ Inherits="SIMS.Lecturer.ManageAttendance" %>
                         </asp:DropDownList>
 
                     </td>
+
+                </tr>
+
+                <tr>
+
+                    <td>ST003</td>
+                    <td>Daniel Wong</td>
+                    <td>Information Technology</td>
+
+                    <td>
+
+                        <asp:DropDownList ID="ddl3" runat="server">
+
+                            <asp:ListItem>Present</asp:ListItem>
+                            <asp:ListItem>Absent</asp:ListItem>
+
+                        </asp:DropDownList>
+
+                    </td>
+
+                </tr>
+
+                <tr>
+
+                    <td>ST004</td>
+                    <td>Alicia Tan</td>
+                    <td>Cyber Security</td>
+
+                    <td>
+
+                        <asp:DropDownList ID="ddl4" runat="server">
+
+                            <asp:ListItem>Present</asp:ListItem>
+                            <asp:ListItem>Absent</asp:ListItem>
+
+                        </asp:DropDownList>
+
+                    </td>
+
                 </tr>
 
             </table>
@@ -497,7 +355,21 @@ Inherits="SIMS.Lecturer.ManageAttendance" %>
             ID="btnSave"
             runat="server"
             Text="Save Attendance"
-            CssClass="save-btn" />
+            CssClass="save-btn"
+            OnClick="btnSave_Click" />
+
+            <div class="grid">
+
+                <asp:GridView
+                ID="GridView1"
+                runat="server"
+                Width="100%"
+                AutoGenerateColumns="true"
+                CellPadding="12"
+                GridLines="None">
+                </asp:GridView>
+
+            </div>
 
         </div>
 

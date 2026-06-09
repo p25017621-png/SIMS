@@ -9,7 +9,6 @@ namespace SIMS.Student
 {
     public partial class StudentDashboard : System.Web.UI.Page
     {
-        // Connection string targeting local SQL instance & your schema database
         private string connString = ConfigurationManager.ConnectionStrings["SIMSConnection"].ConnectionString;
 
         protected void Page_Load(object sender, EventArgs e)
@@ -28,15 +27,20 @@ namespace SIMS.Student
 
                 LoadStudentAndProfileID();
                 LoadStudentProfile();
-                LoadEnrolledCourses();
-                LoadAvailableCourses();
-                LoadAttendanceSummary();
-                LoadAcademicMarks();
-                LoadAnnouncements();
+                RefreshDashboardLayout();
             }
         }
 
-        // Extracts the explicit profile studentID linked with the master login userID
+        // Consolidated workflow routine to prevent state tracking mismatch across components
+        private void RefreshDashboardLayout()
+        {
+            LoadEnrolledCourses();
+            LoadAvailableCourses();
+            LoadAttendanceSummary();
+            LoadAcademicMarksAndCalculateMetrics(); // Runs dual binding & safe metric evaluations
+            LoadAnnouncements();
+        }
+
         private void LoadStudentAndProfileID()
         {
             using (SqlConnection conn = new SqlConnection(connString))
@@ -67,11 +71,14 @@ namespace SIMS.Student
                 SqlDataReader reader = cmd.ExecuteReader();
                 if (reader.Read())
                 {
-                    lblStudentName.Text = reader["name"].ToString();
+                    string fullName = reader["name"].ToString();
+                    lblStudentName.Text = fullName;
                     lblStudentID.Text = reader["studentID"].ToString();
                     lblEmail.Text = reader["email"].ToString();
                     lblPhone.Text = reader["phone"] != DBNull.Value ? reader["phone"].ToString() : "N/A";
                     lblAddress.Text = reader["address"] != DBNull.Value ? reader["address"].ToString() : "N/A";
+
+
                 }
             }
         }
@@ -89,8 +96,12 @@ namespace SIMS.Student
                 SqlDataAdapter da = new SqlDataAdapter(cmd);
                 DataTable dt = new DataTable();
                 da.Fill(dt);
+
                 gvEnrolledCourses.DataSource = dt;
                 gvEnrolledCourses.DataBind();
+
+                // 1. Direct Course Tile Metric Calculation from active Data table
+                litCourseCount.Text = dt.Rows.Count.ToString();
             }
         }
 
@@ -104,14 +115,31 @@ namespace SIMS.Student
                 cmd.Parameters.AddWithValue("@studentID", Session["studentID"]);
 
                 conn.Open();
-                ddlAvailableCourses.DataSource = cmd.ExecuteReader();
+
+                DataTable dt = new DataTable();
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    dt.Load(reader);
+                }
+
+                ddlAvailableCourses.DataSource = dt;
                 ddlAvailableCourses.DataTextField = "courseName";
                 ddlAvailableCourses.DataValueField = "courseID";
                 ddlAvailableCourses.DataBind();
 
-                if (ddlAvailableCourses.Items.Count == 0)
+                // Dropdown Contextual Safety Check
+                if (dt.Rows.Count == 0)
                 {
                     ddlAvailableCourses.Items.Add(new ListItem("No available courses left to register", ""));
+                    btnRegisterCourse.Enabled = false;
+                    btnRegisterCourse.Style["background-color"] = "#cbd5e1";
+                    btnRegisterCourse.Style["cursor"] = "not-allowed";
+                }
+                else
+                {
+                    btnRegisterCourse.Enabled = true;
+                    btnRegisterCourse.Style["background-color"] = "#3498db";
+                    btnRegisterCourse.Style["cursor"] = "pointer";
                 }
             }
         }
@@ -125,7 +153,6 @@ namespace SIMS.Student
 
             using (SqlConnection conn = new SqlConnection(connString))
             {
-                // Intermediate Requirement: Automated Course Enrolment Validation Check
                 string checkQuery = "SELECT COUNT(1) FROM Enrolments WHERE studentID = @studentID AND courseID = @courseID";
                 SqlCommand checkCmd = new SqlCommand(checkQuery, conn);
                 checkCmd.Parameters.AddWithValue("@studentID", studentID);
@@ -148,11 +175,7 @@ namespace SIMS.Student
                 insertCmd.ExecuteNonQuery();
                 ShowAlert("Enrolled in course successfully!", "green");
 
-                // Refresh UI Panels
-                LoadEnrolledCourses();
-                LoadAvailableCourses();
-                LoadAttendanceSummary();
-                LoadAcademicMarks();
+                RefreshDashboardLayout();
             }
         }
 
@@ -175,10 +198,7 @@ namespace SIMS.Student
 
                     ShowAlert("Course dropped successfully.", "orange");
 
-                    LoadEnrolledCourses();
-                    LoadAvailableCourses();
-                    LoadAttendanceSummary();
-                    LoadAcademicMarks();
+                    RefreshDashboardLayout();
                 }
             }
         }
@@ -187,7 +207,6 @@ namespace SIMS.Student
         {
             using (SqlConnection conn = new SqlConnection(connString))
             {
-                // Intermediate Requirement: Automated Attendance Percentage Calculation Engine
                 string query = @"SELECT c.courseName,
                                  COUNT(a.attendanceID) as TotalClasses,
                                  SUM(CASE WHEN a.status = 'Present' THEN 1 ELSE 0 END) as PresentDays,
@@ -208,14 +227,31 @@ namespace SIMS.Student
                 da.Fill(dt);
                 gvAttendance.DataSource = dt;
                 gvAttendance.DataBind();
+
+                // 2. Aggregate Attendance Metric Engine (Aggregated purely in C# logic)
+                if (dt.Rows.Count > 0)
+                {
+                    double cumulativeAttendancePercent = 0;
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        cumulativeAttendancePercent += Convert.ToDouble(row["AttendancePercentage"]);
+                    }
+                    double averageAttendanceOverall = cumulativeAttendancePercent / dt.Rows.Count;
+                    litAttendanceRate.Text = averageAttendanceOverall.ToString("F0") + "%";
+                }
+                else
+                {
+                    litAttendanceRate.Text = "100%";
+                }
             }
         }
 
-        private void LoadAcademicMarks()
+        private void LoadAcademicMarksAndCalculateMetrics()
         {
             using (SqlConnection conn = new SqlConnection(connString))
             {
-                string query = @"SELECT c.courseName, m.score, m.remarks 
+                // Pulling required fields into local object frame
+                string query = @"SELECT c.courseName, c.credits, m.score, m.remarks 
                                  FROM Marks m JOIN Courses c ON m.courseID = c.courseID 
                                  WHERE m.studentID = @studentID";
                 SqlCommand cmd = new SqlCommand(query, conn);
@@ -224,8 +260,82 @@ namespace SIMS.Student
                 SqlDataAdapter da = new SqlDataAdapter(cmd);
                 DataTable dt = new DataTable();
                 da.Fill(dt);
+
                 gvMarks.DataSource = dt;
                 gvMarks.DataBind();
+
+                // 3. Mathematical Credit-Weighted GPA Mapping Engine (Executed strictly in C# code)
+                decimal aggregatedWeightedPoints = 0;
+                int consolidatedCreditDenominator = 0;
+
+                foreach (DataRow row in dt.Rows)
+                {
+                    if (row["score"] != DBNull.Value)
+                    {
+                        double rawScore = Convert.ToDouble(row["score"]);
+                        int courseCredits = row["credits"] != DBNull.Value ? Convert.ToInt32(row["credits"]) : 3; // Fallback to standard 3 credits
+                        decimal stepScaleGradePoint = 0.00m;
+
+                        // Linear-to-Step non-linear grading formula translation boundary logic
+                        if (rawScore >= 80) stepScaleGradePoint = 4.00m;
+                        else if (rawScore >= 75) stepScaleGradePoint = 3.67m;
+                        else if (rawScore >= 70) stepScaleGradePoint = 3.33m;
+                        else if (rawScore >= 65) stepScaleGradePoint = 3.00m;
+                        else if (rawScore >= 60) stepScaleGradePoint = 2.67m;
+                        else if (rawScore >= 55) stepScaleGradePoint = 2.33m;
+                        else if (rawScore >= 50) stepScaleGradePoint = 2.00m;
+                        else stepScaleGradePoint = 0.00m;
+
+                        aggregatedWeightedPoints += (stepScaleGradePoint * courseCredits);
+                        consolidatedCreditDenominator += courseCredits;
+                    }
+                }
+
+                decimal dynamicCalculatedCGPA = consolidatedCreditDenominator > 0
+                    ? (aggregatedWeightedPoints / consolidatedCreditDenominator)
+                    : 0.00m;
+
+                litCGPA.Text = dynamicCalculatedCGPA.ToString("0.00");
+            }
+        }
+
+        // Intercepts GridView binding at runtime to apply dynamic Pill CSS badges
+        protected void gvMarks_RowDataBound(object sender, GridViewRowEventArgs e)
+        {
+            if (e.Row.RowType == DataControlRowType.DataRow)
+            {
+                Label lblBadge = (Label)e.Row.FindControl("lblRemarksBadge");
+                if (lblBadge != null)
+                {
+                    string remarkText = lblBadge.Text.Trim().ToUpper();
+
+                    // 1. Core structural styling for an exclusive badge look
+                    lblBadge.Style["display"] = "inline-block";
+                    lblBadge.Style["padding"] = "6px 12px";
+                    lblBadge.Style["border-radius"] = "9999px";
+                    lblBadge.Style["font-size"] = "11px";
+                    lblBadge.Style["font-weight"] = "700";
+                    lblBadge.Style["text-transform"] = "uppercase";
+                    lblBadge.Style["letter-spacing"] = "0.05em";
+                    lblBadge.Style["text-align"] = "center";
+
+                    // 2. Premium Luxury Color Palette injection based on grades
+                    if (remarkText == "FAIL" || remarkText == "RETAKE")
+                    {
+                        lblBadge.Style["background-color"] = "#fee2e2"; // Soft luxury red
+                        lblBadge.Style["color"] = "#991b1b";            // Deep crimson text
+                    }
+                    else if (remarkText == "PASS" || remarkText == "GOOD")
+                    {
+                        lblBadge.Style["background-color"] = "#dcfce7"; // Soft luxury emerald green
+                        lblBadge.Style["color"] = "#166534";            // Rich forest green text
+                    }
+                    else // Excellent / Distinction / Top Marks state
+                    {
+                        lblBadge.Style["background-color"] = "#f3e8ff"; // Soft luxury amethyst purple
+                        lblBadge.Style["color"] = "#6b21a8";            // Royal purple text
+                    }
+                }
             }
         }
 

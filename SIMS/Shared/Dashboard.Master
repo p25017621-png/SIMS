@@ -38,31 +38,15 @@
                 </div>
 
                 <nav class="sidebar-nav">
-
-                    <a href="#" class="nav-item active">
+                    <a href="StudentDashboard.aspx" class="nav-item">
                         Dashboard
                     </a>
-
-                    <a href="#" class="nav-item">
+                    <a href="Students.aspx" class="nav-item">
                         Students
                     </a>
-
-                    <a href="#" class="nav-item">
+                    <a href="Lecturers.aspx" class="nav-item">
                         Lecturers
                     </a>
-
-                    <a href="#" class="nav-item">
-                        Courses
-                    </a>
-
-                    <a href="#" class="nav-item">
-                        Reports
-                    </a>
-
-                    <a href="#" class="nav-item">
-                        Settings
-                    </a>
-
                 </nav>
 
                 <div class="sidebar-footer">

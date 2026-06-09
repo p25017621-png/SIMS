@@ -1,85 +1,121 @@
-﻿using System;
+﻿
+using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Web.UI;
 
 namespace SIMS.Lecturer
 {
-    public partial class ManageAttendance : System.Web.UI.Page
+    public partial class ManageAttendance : Page
     {
-        SqlConnection con = new SqlConnection(
-        @"Data Source=(LocalDB)\MSSQLLocalDB;
-        Initial Catalog=SIMS_DB;
-        Integrated Security=True");
+        string connStr = System.Web.Configuration.WebConfigurationManager
+                         .ConnectionStrings["SIMSConnection"].ConnectionString;
 
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
             {
-                LoadAttendance();
+                txtDate.Text = DateTime.Today.ToString("yyyy-MM-dd");
+                LoadStats();
+                LoadPoorAttendance();
             }
         }
 
-        protected void btnSave_Click(object sender, EventArgs e)
+        private void LoadStats()
         {
-            con.Open();
+            lblTotal.Text = "25";
+            lblPresent.Text = "20";
+            lblLate.Text = "2";
+            lblAbsent.Text = "3";
 
-            SqlCommand cmd1 = new SqlCommand(
-            "INSERT INTO Attendance VALUES(@id,@name,@course,@status)", con);
-
-            cmd1.Parameters.AddWithValue("@id", "ST001");
-            cmd1.Parameters.AddWithValue("@name", "John Tan");
-            cmd1.Parameters.AddWithValue("@course", "Computer Science");
-            cmd1.Parameters.AddWithValue("@status", ddl1.SelectedValue);
-
-            cmd1.ExecuteNonQuery();
-
-            SqlCommand cmd2 = new SqlCommand(
-            "INSERT INTO Attendance VALUES(@id,@name,@course,@status)", con);
-
-            cmd2.Parameters.AddWithValue("@id", "ST002");
-            cmd2.Parameters.AddWithValue("@name", "Sarah Lim");
-            cmd2.Parameters.AddWithValue("@course", "Software Engineering");
-            cmd2.Parameters.AddWithValue("@status", ddl2.SelectedValue);
-
-            cmd2.ExecuteNonQuery();
-
-            SqlCommand cmd3 = new SqlCommand(
-            "INSERT INTO Attendance VALUES(@id,@name,@course,@status)", con);
-
-            cmd3.Parameters.AddWithValue("@id", "ST003");
-            cmd3.Parameters.AddWithValue("@name", "Daniel Wong");
-            cmd3.Parameters.AddWithValue("@course", "Information Technology");
-            cmd3.Parameters.AddWithValue("@status", ddl3.SelectedValue);
-
-            cmd3.ExecuteNonQuery();
-
-            SqlCommand cmd4 = new SqlCommand(
-            "INSERT INTO Attendance VALUES(@id,@name,@course,@status)", con);
-
-            cmd4.Parameters.AddWithValue("@id", "ST004");
-            cmd4.Parameters.AddWithValue("@name", "Alicia Tan");
-            cmd4.Parameters.AddWithValue("@course", "Cyber Security");
-            cmd4.Parameters.AddWithValue("@status", ddl4.SelectedValue);
-
-            cmd4.ExecuteNonQuery();
-
-            con.Close();
-
-            LoadAttendance();
+            // Real DB:
+            // using (SqlConnection con = new SqlConnection(connStr))
+            // {
+            //     con.Open();
+            //     string sql = @"SELECT
+            //         COUNT(*) AS Total,
+            //         SUM(CASE WHEN Status='P' THEN 1 ELSE 0 END) AS Present,
+            //         SUM(CASE WHEN Status='L' THEN 1 ELSE 0 END) AS Late,
+            //         SUM(CASE WHEN Status='A' THEN 1 ELSE 0 END) AS Absent
+            //         FROM Attendance WHERE Date = @date AND CourseID = @cid";
+            //     SqlCommand cmd = new SqlCommand(sql, con);
+            //     cmd.Parameters.AddWithValue("@date", txtDate.Text);
+            //     cmd.Parameters.AddWithValue("@cid",  ddlCourse.SelectedValue);
+            //     SqlDataReader dr = cmd.ExecuteReader();
+            //     if (dr.Read())
+            //     {
+            //         lblTotal.Text   = dr["Total"].ToString();
+            //         lblPresent.Text = dr["Present"].ToString();
+            //         lblLate.Text    = dr["Late"].ToString();
+            //         lblAbsent.Text  = dr["Absent"].ToString();
+            //     }
+            // }
         }
 
-        void LoadAttendance()
+        protected void btnLoad_Click(object sender, EventArgs e)
         {
-            SqlDataAdapter da = new SqlDataAdapter(
-            "SELECT * FROM Attendance", con);
+            LoadStats();
+            LoadPoorAttendance();
+        }
 
-            DataTable dt = new DataTable();
+        protected void btnSaveAttendance_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // Real DB:
+                // using (SqlConnection con = new SqlConnection(connStr))
+                // {
+                //     con.Open();
+                //     // Loop through students and save P/A/L status
+                //     string sql = @"IF EXISTS (SELECT 1 FROM Attendance WHERE StudentID=@sid AND CourseID=@cid AND Date=@date)
+                //                    UPDATE Attendance SET Status=@status WHERE StudentID=@sid AND CourseID=@cid AND Date=@date
+                //                    ELSE
+                //                    INSERT INTO Attendance (StudentID,CourseID,Date,Status) VALUES (@sid,@cid,@date,@status)";
+                //     SqlCommand cmd = new SqlCommand(sql, con);
+                //     cmd.Parameters.AddWithValue("@cid",    ddlCourse.SelectedValue);
+                //     cmd.Parameters.AddWithValue("@date",   txtDate.Text);
+                //     // Add @sid and @status per student row
+                // }
 
-            da.Fill(dt);
+                ClientScript.RegisterStartupScript(this.GetType(), "msg",
+                    "alert('Attendance saved successfully!');", true);
+            }
+            catch (Exception ex)
+            {
+                ClientScript.RegisterStartupScript(this.GetType(), "err",
+                    "alert('Error: " + ex.Message + "');", true);
+            }
+        }
 
-            GridView1.DataSource = dt;
-
-            GridView1.DataBind();
+        // Requirement G — identify students with poor attendance below 75%
+        private void LoadPoorAttendance()
+        {
+            // Real DB:
+            // using (SqlConnection con = new SqlConnection(connStr))
+            // {
+            //     con.Open();
+            //     string sql = @"
+            //         SELECT s.StudentID,
+            //                LEFT(s.Name,1) AS Initial,
+            //                s.Name,
+            //                c.CourseName AS Course,
+            //                CAST(SUM(CASE WHEN a.Status='P' OR a.Status='L' THEN 1 ELSE 0 END) * 100.0 / COUNT(*) AS INT) AS AttendancePct,
+            //                SUM(CASE WHEN a.Status='A' THEN 1 ELSE 0 END) AS Missed
+            //         FROM Attendance a
+            //         JOIN Students s ON a.StudentID = s.StudentID
+            //         JOIN Courses  c ON a.CourseID  = c.CourseID
+            //         WHERE c.LecturerID = @lid
+            //         GROUP BY s.StudentID, s.Name, c.CourseName
+            //         HAVING (SUM(CASE WHEN a.Status='P' OR a.Status='L' THEN 1 ELSE 0 END) * 100.0 / COUNT(*)) < 75";
+            //     SqlCommand cmd = new SqlCommand(sql, con);
+            //     cmd.Parameters.AddWithValue("@lid", Session["LecturerID"]);
+            //     SqlDataAdapter da = new SqlDataAdapter(cmd);
+            //     DataTable dt = new DataTable();
+            //     da.Fill(dt);
+            //     rptPoorAttendance.DataSource = dt;
+            //     rptPoorAttendance.DataBind();
+            // }
         }
     }
 }

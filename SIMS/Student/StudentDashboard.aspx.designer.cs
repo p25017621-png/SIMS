@@ -42,6 +42,24 @@ namespace SIMS.Student
         protected global::System.Web.UI.WebControls.Label lblStudentName;
 
         /// <summary>
+        /// lblTrack control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblTrack;
+
+        /// <summary>
+        /// lblTerm control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblTerm;
+
+        /// <summary>
         /// lblStudentID control.
         /// </summary>
         /// <remarks>
@@ -130,6 +148,15 @@ namespace SIMS.Student
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.DropDownList ddlAvailableCourses;
+
+        /// <summary>
+        /// ddlSemester control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList ddlSemester;
 
         /// <summary>
         /// btnRegisterCourse control.

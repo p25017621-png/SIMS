@@ -102,7 +102,10 @@
     <Content Include="Assets\CSS\components.css" />
     <Content Include="Assets\CSS\dashboard.css" />
     <Content Include="Assets\CSS\global.css" />
+    <Content Include="Assets\CSS\LecturerStudent-style.css" />
     <Content Include="Assets\CSS\sidebar.css" />
+    <Content Include="Assets\CSS\Studentdashboard-styles.css" />
+    <Content Include="Assets\CSS\StudentProfile-style.css" />
     <Content Include="Contact.aspx" />
     <Content Include="Content\bootstrap-grid.css" />
     <Content Include="Content\bootstrap-grid.min.css" />

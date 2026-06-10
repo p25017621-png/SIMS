@@ -5,403 +5,7 @@
 <head runat="server">
     <title>Student Dashboard - SIMS</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <style type="text/css">
-        /* 🖥️ ROOT VARIABLES & CONFIGURATIONS */
-:root {
-    --primary-grad: linear-gradient(135deg, #7c3aed, #4f46e5);
-    --dark-sidebar: #0f172a; /* Richer, deeper slate midnight blue */
-    --slate-light: #f8fafc;
-    --border-color: rgba(226, 232, 240, 0.7);
-    --text-main: #0f172a;
-    --text-muted: #475569;
-}
-
-body {
-    margin: 0;
-    padding: 0;
-    background-color: #f1f5f9; /* Slightly darker background to make white cards pop */
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    -webkit-font-smoothing: antialiased; /* Smoother, high-end text rendering */
-    -moz-osx-font-smoothing: grayscale;
-    display: flex;
-    min-height: 100vh;
-    color: var(--text-main);
-}
-
-        .app-container {
-            display: flex;
-            width: 100%;
-        }
-
-        /* 🧭 SIDEBAR SYSTEM */
-        .sidebar-nav {
-            width: 260px;
-            background: var(--dark-sidebar);
-            color: #f8fafc;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 24px 16px;
-            box-sizing: border-box;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: fixed;
-            top: 0;
-            bottom: 0;
-            left: 0;
-            z-index: 100;
-            box-shadow: 4px 0 25px rgba(0,0,0,0.05);
-        }
-
-        .nav-brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 12px;
-            margin-bottom: 30px;
-        }
-
-        .brand-logo {
-            background: var(--primary-grad);
-            width: 38px;
-            height: 38px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 18px;
-            color: white;
-            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
-        }
-
-        .brand-name {
-            font-size: 18px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            background: linear-gradient(to right, #ffffff, #cbd5e1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .nav-links {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            flex-grow: 1;
-        }
-
-.nav-item {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 14px 18px;
-    color: #94a3b8;
-    text-decoration: none;
-    border-radius: 12px; /* Matching the updated card curves */
-    font-weight: 600;
-    font-size: 16px; 
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); /* Premium ease curve */
-    cursor: pointer;
-    border: none;
-    background: transparent;
-    text-align: left;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-.nav-item:hover {
-    color: #ffffff;
-    background: rgba(255, 255, 255, 0.05);
-    transform: translateX(4px);
-}
-
-.nav-item.active {
-    color: #ffffff;
-    background: linear-gradient(135deg, #7c3aed, #6366f1); /* Gradient instead of flat purple */
-    box-shadow: 0 10px 20px -5px rgba(124, 58, 237, 0.4);
-}
-
-.nav-item-icon {
-    font-size: 18px; /* Balanced perfectly with the 16px text font */
-}
-
-        .nav-footer {
-            border-top: 1px solid rgba(255, 255, 255, 0.06);
-            padding-top: 20px;
-        }
-
-        /* 📦 MAIN CONTENT WORKSPACE */
-        .main-dashboard-wrapper {
-            flex-grow: 1;
-            margin-left: 260px;
-            padding: 40px;
-            box-sizing: border-box;
-            min-height: 100vh;
-            background: #f8fafc;
-            transition: all 0.3s ease;
-        }
-
-.glass-card {
-    background: #ffffff;
-    padding: 40px;
-    border-radius: 20px; /* Slightly rounder for a modern aesthetic */
-    /* Premium layered shadow effect */
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 
-                0 10px 15px -3px rgba(15, 23, 42, 0.03), 
-                0 4px 6px -4px rgba(15, 23, 42, 0.03);
-    border: 1px solid var(--border-color);
-}
-
-        /* 📱 MOBILE HEADER */
-        .mobile-header {
-            display: none;
-            background: var(--dark-sidebar);
-            color: white;
-            padding: 14px 20px;
-            align-items: center;
-            justify-content: space-between;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 105;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        .mobile-menu-toggle {
-            background: transparent;
-            border: none;
-            color: white;
-            font-size: 22px;
-            cursor: pointer;
-        }
-
-        /* 👤 STUDENT IDENTITY AREA */
-        .profile-hero-section {
-            background: var(--primary-grad);
-            padding: 28px 32px;
-            border-radius: 16px;
-            color: white;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.15);
-        }
-
-        /* 📊 VISUAL ANALYTIC METRICS */
-.stats-counters-container {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 24px;
-    margin-bottom: 35px;
-}
-
-.stat-card { 
-    padding: 24px; 
-    border-radius: 16px; 
-    background: #ffffff;
-    color: var(--text-main); /* Dark elegant text instead of white */
-    border: 1px solid var(--border-color);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -2px rgba(0, 0, 0, 0.02);
-    transition: all 0.25s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-.stat-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 20px 25px -5px rgba(0,0,0,0.05);
-}
-
-/* Premium indicator bars on top of the cards */
-.stat-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-}
-
-.bg-blue::before { background: #3b82f6; }
-.bg-green::before { background: #10b981; }
-.bg-purple::before { background: #7c3aed; }
-
-/* Adjust the text colors inside the card to look balanced */
-.stat-card h4 {
-    color: var(--text-muted) !important;
-}
-.stat-card p {
-    color: var(--text-main) !important;
-}
-
-        /* 🗃️ DATA GRIDS AND INTERFACES */
-        .dashboard-grid-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
-            margin-top: 20px;
-        }
-
-        .section-heading {
-            margin-top: 0; 
-            color: var(--text-main); 
-            font-size: 1.2rem; 
-            margin-bottom: 18px; 
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .custom-table-container {
-            background: white; 
-            border-radius: 12px; 
-            overflow: hidden; 
-            border: 1px solid var(--border-color);
-        }
-
-        .progress-track { 
-            background: #e2e8f0; 
-            border-radius: 10px; 
-            height: 8px; 
-            width: 100px; 
-            display: inline-block; 
-            overflow: hidden; 
-            vertical-align: middle; 
-            margin-right: 8px; 
-        }
-        .progress-bar { height: 100%; border-radius: 10px; transition: width 0.4s ease; }
-
-        /* 🖨️ PRINT RULES */
-        @media print {
-            @page { size: A4 portrait; margin: 20mm 15mm; }
-            body { background: #ffffff !important; color: #000000 !important; font-family: 'Times New Roman', serif !important; font-size: 11pt !important; }
-            .sidebar-nav, .mobile-header, .course-registration-gateway, .screen-only-profile, .stats-counters-container, .announcements-panel-wrapper, .print-hidden-btn, .progress-track, [id*="btnDrop"] {
-                display: none !important;
-            }
-            .main-dashboard-wrapper { margin-left: 0 !important; padding: 0 !important; }
-            .glass-card { border: none !important; padding: 0 !important; box-shadow: none !important; }
-            .printable-title { display: block !important; text-align: center; margin-bottom: 25px; border-bottom: 2px solid #000000; padding-bottom: 10px; }
-            .printable-profile-area { display: block !important; margin-bottom: 30px !important; border: 1px solid #000000 !important; padding: 15px !important; }
-            .profile-meta-table { display: table !important; width: 100% !important; border-collapse: collapse !important; }
-            .profile-meta-row { display: table-row !important; }
-            .profile-meta-cell { display: table-cell !important; padding: 6px !important; border: none !important; font-size: 11pt !important; }
-            .dashboard-grid-container { display: block !important; }
-            .custom-table-container { border: none !important; margin-bottom: 20px; }
-            table { width: 100% !important; border-collapse: collapse !important; }
-            th { background: #f2f2f2 !important; border: 1px solid #000000 !important; color: black !important; padding: 8px !important; text-transform: uppercase; font-size: 10pt !important; }
-            td { border: 1px solid #000000 !important; padding: 8px !important; background: transparent !important; }
-            .print-footer-signature { display: block !important; margin-top: 50px; }
-        }
-
-        .printable-title, .print-footer-signature, .profile-meta-table { display: none; }
-
-        /* RESPONSIVE LAYOUT RESPONSES */
-        @media (max-width: 1100px) {
-            .dashboard-grid-container { grid-template-columns: 1fr; }
-        }
-        @media (max-width: 768px) {
-            .sidebar-nav { transform: translateX(-100%); }
-            .sidebar-nav.active { transform: translateX(0); }
-            .main-dashboard-wrapper { margin-left: 0; padding: 90px 20px 40px 20px; }
-            .mobile-header { display: flex; }
-            .stats-counters-container { grid-template-columns: 1fr; }
-            .course-registration-gateway { flex-direction: column; align-items: stretch !important; }
-        }
-        /* Custom GridView Header Line */
-.gv-header th {
-    border-bottom: 1px solid #e2e8f0 !important;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    font-weight: 700 !important;
-    color: #475569 !important;
-}
-
-/* Give the rows a clean hover effect */
-.custom-table-container tr {
-    transition: background-color 0.2s ease;
-}
-
-.custom-table-container tr:hover {
-    background-color: #f8fafc; /* Rows highlight softly when tracking across data */
-}
-/* Custom Scrollbar for Chrome, Safari, and Edge */
-::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-}
-
-::-webkit-scrollbar-track {
-    background: #f1f5f9;
-}
-
-::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
-}
-/* Premium DropDown Styling */
-select[id*="ddlAvailableCourses"] {
-    padding: 12px 16px !important;
-    border-radius: 10px !important;
-    border: 1px solid var(--border-color) !important;
-    font-size: 14px !important;
-    color: var(--text-main) !important;
-    background-color: #ffffff !important;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
-    transition: all 0.2s ease !important;
-    outline: none !important;
-}
-
-select[id*="ddlAvailableCourses"]:focus {
-    border-color: #7c3aed !important;
-    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15) !important;
-}
-
-/* Premium Button Transitions */
-input[type="submit"].btn, button.btn {
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.05) !important;
-}
-
-input[type="submit"].btn:hover {
-    transform: translateY(-1px) !important;
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25) !important;
-    filter: brightness(105%);
-}
-
-/* Specialized Drop Button Hover Styles */
-[id*="btnDrop"]:hover {
-    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25) !important;
-    filter: brightness(105%);
-}
-/* Row Interactivity */
-.custom-table-container table tbody tr:not(:first-child) {
-    cursor: pointer;
-    transition: background-color 0.15s ease, transform 0.1s ease;
-}
-
-.custom-table-container table tbody tr:not(:first-child):hover {
-    background-color: #f8fafc !important;
-}
-/* Remarks Status Badges */
-.badge-status {
-    display: inline-block;
-    padding: 6px 12px;
-    border-radius: 9999px;
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    text-align: center;
-}
-
-.badge-success { background-color: #dcfce7; color: #166534; }
-.badge-warning { background-color: #fef3c7; color: #92400e; }
-.badge-danger { background-color: #fee2e2; color: #991b1b; }
-    </style>
+    <link href="/Assets/CSS/Studentdashboard-styles.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
     <form id="form1" runat="server">
@@ -434,7 +38,6 @@ input[type="submit"].btn:hover {
                         </a>
                     </div>
                 </div>
-                
                 <div class="nav-footer">
                     <asp:LinkButton ID="lnkSidebarLogout" runat="server" OnClick="btnLogout_Click" CssClass="nav-item" Style="color: #ef4444;">
                         <span class="nav-item-icon">🚪</span> Sign Out
@@ -443,28 +46,31 @@ input[type="submit"].btn:hover {
             </nav>
 
             <div class="main-dashboard-wrapper">
-                <!-- Dashboard Top Meta Navigation Info -->
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;" class="screen-only-profile">
-    <div>
-        <h1 style="margin: 0; font-size: 24px; font-weight: 700; color: var(--text-main);">Academic Workspace</h1>
-        <p style="margin: 4px 0 0 0; font-size: 13px; color: var(--text-muted);">SIMS Institutional Portal &bull; Live Academic Records</p>
-    </div>
-    <div style="background: white; padding: 8px 16px; border-radius: 10px; border: 1px solid var(--border-color); font-size: 13px; font-weight: 600; color: var(--text-muted); display: flex; align-items: center; gap: 8px;">
-        <span style="height: 8px; width: 8px; background-color: #10b981; border-radius: 50%; display: inline-block;"></span>
-        System Connected
-    </div>
-</div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;" class="screen-only-profile">
+                    <div>
+                        <h1 style="margin: 0; font-size: 24px; font-weight: 700; color: var(--text-main);">Academic Workspace</h1>
+                        <p style="margin: 4px 0 0 0; font-size: 13px; color: var(--text-muted);">SIMS Institutional Portal &bull; Live Academic Records</p>
+                    </div>
+                    <div style="background: white; padding: 8px 16px; border-radius: 10px; border: 1px solid var(--border-color); font-size: 13px; font-weight: 600; color: var(--text-muted); display: flex; align-items: center; gap: 8px;">
+                        <span style="height: 8px; width: 8px; background-color: #10b981; border-radius: 50%; display: inline-block;"></span>
+                        System Connected
+                    </div>
+                </div>
+
                 <div class="glass-card">
-                    
                     <div class="printable-title">
                         <h2>Student Information Management System (SIMS)</h2>
                         <h4>Official Academic Progress Report</h4>
                     </div>
 
                     <div class="profile-hero-section screen-only-profile">
-                        <h2 style="margin: 0 0 8px 0; font-size: 1.75rem; font-weight: 700;">
+                        <h2 style="margin: 0 0 4px 0; font-size: 1.75rem; font-weight: 700;">
                             Welcome back, <asp:Label ID="lblStudentName" runat="server" Text="Student" />!
                         </h2>
+                        <p style="margin: 0 0 20px 0; font-size: 1.05rem; opacity: 0.95; font-weight: 600; color: #fef08a; display: flex; align-items: center; gap: 6px;">
+                            <span>🎓</span> <asp:Label ID="lblTrack" runat="server" Text="Loading Track..." /> 
+                            &bull; <span>📅</span> <asp:Label ID="lblTerm" runat="server" Text="Loading Term..." />
+                        </p>
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; font-size: 0.95rem; opacity: 0.9;">
                             <div><strong>Student ID:</strong> <asp:Label ID="lblStudentID" runat="server" /></div>
                             <div><strong>Email:</strong> <asp:Label ID="lblEmail" runat="server" /></div>
@@ -480,6 +86,12 @@ input[type="submit"].btn:hover {
                                 <div class="profile-meta-cell"><%= lblStudentName.Text %></div>
                                 <div class="profile-meta-cell"><strong>Student ID:</strong></div>
                                 <div class="profile-meta-cell"><%= lblStudentID.Text %></div>
+                            </div>
+                            <div class="profile-meta-row">
+                                <div class="profile-meta-cell"><strong>Academic Program:</strong></div>
+                                <div class="profile-meta-cell" style="font-weight: 600; color: #1e3a8a;"><%= lblTrack.Text %></div>
+                                <div class="profile-meta-cell"><strong>Current Term:</strong></div>
+                                <div class="profile-meta-cell" style="font-weight: 600;"><%= lblTerm.Text %></div>
                             </div>
                             <div class="profile-meta-row">
                                 <div class="profile-meta-cell"><strong>Email Address:</strong></div>
@@ -527,9 +139,26 @@ input[type="submit"].btn:hover {
                     <div class="course-management-section enrolled-courses-panel-wrapper" style="margin-bottom: 35px;">
                         <h3 class="section-heading">📚 Course Enrollment Hub</h3>
                         
-                        <div class="course-registration-gateway" style="background: #f8fafc; padding: 20px; border-radius: 12px; margin-bottom: 20px; display: flex; gap: 15px; align-items: center; border: 1px solid var(--border-color);">
-                            <label style="font-weight: 600; color: #475569; font-size: 13px; white-space: nowrap;">Register a New Course:</label>
-                            <asp:DropDownList ID="ddlAvailableCourses" runat="server" Style="padding: 10px 14px; border-radius: 8px; border: 1px solid #cbd5e1; flex-grow: 1; font-size:13px; color:#333; background:#fff; min-width: 200px;"></asp:DropDownList>
+                        <div class="course-registration-gateway" style="background: #f8fafc; padding: 20px; border-radius: 12px; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 15px; align-items: center; border: 1px solid var(--border-color);">
+                            
+                            <div style="display: flex; align-items: center; gap: 8px; flex-grow: 2; min-width: 250px;">
+                                <label style="font-weight: 600; color: #475569; font-size: 13px; white-space: nowrap;">Course Catalog:</label>
+                                <asp:DropDownList ID="ddlAvailableCourses" runat="server" Style="padding: 10px 14px; border-radius: 8px; border: 1px solid #cbd5e1; width: 100%; font-size:13px; color:#333; background:#fff;"></asp:DropDownList>
+                            </div>
+
+                            <div style="display: flex; align-items: center; gap: 8px; flex-grow: 1; min-width: 180px;">
+                                <label style="font-weight: 600; color: #475569; font-size: 13px; white-space: nowrap;">Semester:</label>
+                                <asp:DropDownList ID="ddlSemester" runat="server" Style="padding: 10px 14px; border-radius: 8px; border: 1px solid #cbd5e1; width: 100%; font-size:13px; color:#333; background:#fff;">
+                                    <asp:ListItem Text="-- Select Semester --" Value="" />
+                                    <asp:ListItem Text="Semester 1" Value="1" />
+                                    <asp:ListItem Text="Semester 2" Value="2" />
+                                    <asp:ListItem Text="Semester 3" Value="3" />
+                                    <asp:ListItem Text="Semester 4" Value="4" />
+                                    <asp:ListItem Text="Semester 5" Value="5" />
+                                    <asp:ListItem Text="Semester 6" Value="6" />
+                                </asp:DropDownList>
+                            </div>
+
                             <asp:Button ID="btnRegisterCourse" runat="server" Text="Enroll Course" OnClick="btnRegisterCourse_Click" CssClass="btn"
                                 Style="background-color: #10b981; color: white; border: none; padding: 11px 24px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px; transition: background 0.2s; white-space: nowrap;" />
                         </div>
@@ -608,7 +237,6 @@ input[type="submit"].btn:hover {
                                 </asp:GridView>
                             </div>
                         </div>
-
                     </div>
 
                     <div class="print-footer-signature">
@@ -632,7 +260,6 @@ input[type="submit"].btn:hover {
             </div>
         </div>
     </form>
-
     <script type="text/javascript">
         function toggleMobileMenu() {
             var menu = document.getElementById("sidebarMenu");

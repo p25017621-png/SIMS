@@ -9,7 +9,7 @@ namespace SIMS.Student
 {
     public partial class StudentDashboard : System.Web.UI.Page
     {
-        private string connString = ConfigurationManager.ConnectionStrings["SIMSConnection"].ConnectionString;
+        private readonly string connString = ConfigurationManager.ConnectionStrings["SIMSConnection"].ConnectionString;
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -46,14 +46,16 @@ namespace SIMS.Student
             using (SqlConnection conn = new SqlConnection(connString))
             {
                 string query = "SELECT studentID FROM Students WHERE userID = @userID";
-                SqlCommand cmd = new SqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@userID", Session["userID"]);
-
-                conn.Open();
-                object result = cmd.ExecuteScalar();
-                if (result != null)
+                using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
-                    Session["studentID"] = result;
+                    cmd.Parameters.AddWithValue("@userID", Session["userID"]);
+
+                    conn.Open();
+                    object result = cmd.ExecuteScalar();
+                    if (result != null)
+                    {
+                        Session["studentID"] = result;
+                    }
                 }
             }
         }
@@ -62,23 +64,39 @@ namespace SIMS.Student
         {
             using (SqlConnection conn = new SqlConnection(connString))
             {
-                string query = @"SELECT u.name, u.email, s.studentID, s.phone, s.address 
-                                 FROM Users u JOIN Students s ON u.userID = s.userID WHERE u.userID = @userID";
-                SqlCommand cmd = new SqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@userID", Session["userID"]);
+                // Safely pulls the latest enrollment track/term via subqueries to prevent duplicate row aggregation issues
+                string query = @"
+                    SELECT u.name, u.email, s.studentID, s.phone, s.address,
+                           (SELECT TOP 1 e.semester FROM Enrolments e WHERE e.studentID = s.studentID ORDER BY e.enrolDate DESC) as semester,
+                           (SELECT TOP 1 p.programmeName FROM Enrolments e 
+                            INNER JOIN Programmes p ON e.programmeID = p.programmeID 
+                            WHERE e.studentID = s.studentID ORDER BY e.enrolDate DESC) as programmeName
+                    FROM Users u 
+                    JOIN Students s ON u.userID = s.userID 
+                    WHERE u.userID = @userID";
 
-                conn.Open();
-                SqlDataReader reader = cmd.ExecuteReader();
-                if (reader.Read())
+                using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
-                    string fullName = reader["name"].ToString();
-                    lblStudentName.Text = fullName;
-                    lblStudentID.Text = reader["studentID"].ToString();
-                    lblEmail.Text = reader["email"].ToString();
-                    lblPhone.Text = reader["phone"] != DBNull.Value ? reader["phone"].ToString() : "N/A";
-                    lblAddress.Text = reader["address"] != DBNull.Value ? reader["address"].ToString() : "N/A";
+                    cmd.Parameters.AddWithValue("@userID", Session["userID"]);
 
+                    conn.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            lblStudentName.Text = reader["name"].ToString();
+                            lblStudentID.Text = reader["studentID"].ToString();
+                            lblEmail.Text = reader["email"].ToString();
+                            lblPhone.Text = reader["phone"] != DBNull.Value ? reader["phone"].ToString() : "N/A";
+                            lblAddress.Text = reader["address"] != DBNull.Value ? reader["address"].ToString() : "N/A";
 
+                            string trackName = reader["programmeName"] != DBNull.Value ? reader["programmeName"].ToString() : "";
+                            string semValue = reader["semester"] != DBNull.Value ? reader["semester"].ToString() : "";
+
+                            lblTrack.Text = !string.IsNullOrEmpty(trackName) ? trackName : "General Track";
+                            lblTerm.Text = !string.IsNullOrEmpty(semValue) ? "Semester " + semValue : "Semester 1";
+                        }
+                    }
                 }
             }
         }
@@ -90,18 +108,22 @@ namespace SIMS.Student
                 string query = @"SELECT c.courseID, c.courseName, c.description, c.credits 
                                  FROM Enrolments e JOIN Courses c ON e.courseID = c.courseID 
                                  WHERE e.studentID = @studentID";
-                SqlCommand cmd = new SqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@studentID", Session["studentID"]);
 
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
-                DataTable dt = new DataTable();
-                da.Fill(dt);
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@studentID", Session["studentID"]);
 
-                gvEnrolledCourses.DataSource = dt;
-                gvEnrolledCourses.DataBind();
+                    using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+                    {
+                        DataTable dt = new DataTable();
+                        da.Fill(dt);
 
-                // 1. Direct Course Tile Metric Calculation from active Data table
-                litCourseCount.Text = dt.Rows.Count.ToString();
+                        gvEnrolledCourses.DataSource = dt;
+                        gvEnrolledCourses.DataBind();
+
+                        litCourseCount.Text = dt.Rows.Count.ToString();
+                    }
+                }
             }
         }
 
@@ -111,69 +133,90 @@ namespace SIMS.Student
             {
                 string query = @"SELECT courseID, courseName FROM Courses 
                                  WHERE courseID NOT IN (SELECT courseID FROM Enrolments WHERE studentID = @studentID)";
-                SqlCommand cmd = new SqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@studentID", Session["studentID"]);
 
-                conn.Open();
-
-                DataTable dt = new DataTable();
-                using (SqlDataReader reader = cmd.ExecuteReader())
+                using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
-                    dt.Load(reader);
-                }
+                    cmd.Parameters.AddWithValue("@studentID", Session["studentID"]);
 
-                ddlAvailableCourses.DataSource = dt;
-                ddlAvailableCourses.DataTextField = "courseName";
-                ddlAvailableCourses.DataValueField = "courseID";
-                ddlAvailableCourses.DataBind();
+                    conn.Open();
+                    DataTable dt = new DataTable();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        dt.Load(reader);
+                    }
 
-                // Dropdown Contextual Safety Check
-                if (dt.Rows.Count == 0)
-                {
-                    ddlAvailableCourses.Items.Add(new ListItem("No available courses left to register", ""));
-                    btnRegisterCourse.Enabled = false;
-                    btnRegisterCourse.Style["background-color"] = "#cbd5e1";
-                    btnRegisterCourse.Style["cursor"] = "not-allowed";
-                }
-                else
-                {
-                    btnRegisterCourse.Enabled = true;
-                    btnRegisterCourse.Style["background-color"] = "#3498db";
-                    btnRegisterCourse.Style["cursor"] = "pointer";
+                    ddlAvailableCourses.DataSource = dt;
+                    ddlAvailableCourses.DataTextField = "courseName";
+                    ddlAvailableCourses.DataValueField = "courseID";
+                    ddlAvailableCourses.DataBind();
+
+                    if (dt.Rows.Count == 0)
+                    {
+                        ddlAvailableCourses.Items.Add(new ListItem("No available courses left to register", ""));
+                        btnRegisterCourse.Enabled = false;
+                        btnRegisterCourse.Style["background-color"] = "#cbd5e1";
+                        btnRegisterCourse.Style["cursor"] = "not-allowed";
+                    }
+                    else
+                    {
+                        btnRegisterCourse.Enabled = true;
+                        btnRegisterCourse.Style["background-color"] = "#3498db";
+                        btnRegisterCourse.Style["cursor"] = "pointer";
+                    }
                 }
             }
         }
 
         protected void btnRegisterCourse_Click(object sender, EventArgs e)
         {
+            // 1. Validasi pilihan course dan semester
             if (string.IsNullOrEmpty(ddlAvailableCourses.SelectedValue)) return;
+
+            if (string.IsNullOrEmpty(ddlSemester.SelectedValue))
+            {
+                ShowAlert("Please select a semester before registering.", "red");
+                return;
+            }
 
             int courseID = Convert.ToInt32(ddlAvailableCourses.SelectedValue);
             int studentID = Convert.ToInt32(Session["studentID"]);
+            string selectedSemester = ddlSemester.SelectedValue;
 
             using (SqlConnection conn = new SqlConnection(connString))
             {
-                string checkQuery = "SELECT COUNT(1) FROM Enrolments WHERE studentID = @studentID AND courseID = @courseID";
-                SqlCommand checkCmd = new SqlCommand(checkQuery, conn);
-                checkCmd.Parameters.AddWithValue("@studentID", studentID);
-                checkCmd.Parameters.AddWithValue("@courseID", courseID);
+                // 2. Semakan keselamatan: Elakkan duplicate enrolment untuk subjek yang sama pada semester yang sama
+                string checkQuery = "SELECT COUNT(1) FROM Enrolments WHERE studentID = @studentID AND courseID = @courseID AND semester = @semester";
 
                 conn.Open();
-                int existingCount = (int)checkCmd.ExecuteScalar();
-
-                if (existingCount > 0)
+                using (SqlCommand checkCmd = new SqlCommand(checkQuery, conn))
                 {
-                    ShowAlert("You are already enrolled in this course.", "red");
-                    return;
+                    checkCmd.Parameters.AddWithValue("@studentID", studentID);
+                    checkCmd.Parameters.AddWithValue("@courseID", courseID);
+                    checkCmd.Parameters.AddWithValue("@semester", selectedSemester);
+
+                    int existingCount = (int)checkCmd.ExecuteScalar();
+                    if (existingCount > 0)
+                    {
+                        ShowAlert("You are already enrolled in this course for this semester.", "red");
+                        return;
+                    }
                 }
 
-                string insertQuery = "INSERT INTO Enrolments (studentID, courseID, enrolDate) VALUES (@studentID, @courseID, GETDATE())";
-                SqlCommand insertCmd = new SqlCommand(insertQuery, conn);
-                insertCmd.Parameters.AddWithValue("@studentID", studentID);
-                insertCmd.Parameters.AddWithValue("@courseID", courseID);
+                // 3. Insert data baru berserta nilai semester terkini
+                string insertQuery = "INSERT INTO Enrolments (studentID, courseID, semester, enrolDate) VALUES (@studentID, @courseID, @semester, GETDATE())";
+                using (SqlCommand insertCmd = new SqlCommand(insertQuery, conn))
+                {
+                    insertCmd.Parameters.AddWithValue("@studentID", studentID);
+                    insertCmd.Parameters.AddWithValue("@courseID", courseID);
+                    insertCmd.Parameters.AddWithValue("@semester", selectedSemester);
 
-                insertCmd.ExecuteNonQuery();
+                    insertCmd.ExecuteNonQuery();
+                }
+
                 ShowAlert("Enrolled in course successfully!", "green");
+
+                // Reset dropdown semester ke default
+                ddlSemester.SelectedIndex = 0;
 
                 RefreshDashboardLayout();
             }
@@ -189,15 +232,16 @@ namespace SIMS.Student
                 using (SqlConnection conn = new SqlConnection(connString))
                 {
                     string deleteQuery = "DELETE FROM Enrolments WHERE studentID = @studentID AND courseID = @courseID";
-                    SqlCommand cmd = new SqlCommand(deleteQuery, conn);
-                    cmd.Parameters.AddWithValue("@studentID", studentID);
-                    cmd.Parameters.AddWithValue("@courseID", courseID);
+                    using (SqlCommand cmd = new SqlCommand(deleteQuery, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@studentID", studentID);
+                        cmd.Parameters.AddWithValue("@courseID", courseID);
 
-                    conn.Open();
-                    cmd.ExecuteNonQuery();
+                        conn.Open();
+                        cmd.ExecuteNonQuery();
+                    }
 
                     ShowAlert("Course dropped successfully.", "orange");
-
                     RefreshDashboardLayout();
                 }
             }
@@ -219,29 +263,32 @@ namespace SIMS.Student
                                  WHERE e.studentID = @studentID
                                  GROUP BY c.courseName, c.courseID";
 
-                SqlCommand cmd = new SqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@studentID", Session["studentID"]);
-
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
-                DataTable dt = new DataTable();
-                da.Fill(dt);
-                gvAttendance.DataSource = dt;
-                gvAttendance.DataBind();
-
-                // 2. Aggregate Attendance Metric Engine (Aggregated purely in C# logic)
-                if (dt.Rows.Count > 0)
+                using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
-                    double cumulativeAttendancePercent = 0;
-                    foreach (DataRow row in dt.Rows)
+                    cmd.Parameters.AddWithValue("@studentID", Session["studentID"]);
+
+                    using (SqlDataAdapter da = new SqlDataAdapter(cmd))
                     {
-                        cumulativeAttendancePercent += Convert.ToDouble(row["AttendancePercentage"]);
+                        DataTable dt = new DataTable();
+                        da.Fill(dt);
+                        gvAttendance.DataSource = dt;
+                        gvAttendance.DataBind();
+
+                        if (dt.Rows.Count > 0)
+                        {
+                            double cumulativeAttendancePercent = 0;
+                            foreach (DataRow row in dt.Rows)
+                            {
+                                cumulativeAttendancePercent += Convert.ToDouble(row["AttendancePercentage"]);
+                            }
+                            double averageAttendanceOverall = cumulativeAttendancePercent / dt.Rows.Count;
+                            litAttendanceRate.Text = averageAttendanceOverall.ToString("F0") + "%";
+                        }
+                        else
+                        {
+                            litAttendanceRate.Text = "100%";
+                        }
                     }
-                    double averageAttendanceOverall = cumulativeAttendancePercent / dt.Rows.Count;
-                    litAttendanceRate.Text = averageAttendanceOverall.ToString("F0") + "%";
-                }
-                else
-                {
-                    litAttendanceRate.Text = "100%";
                 }
             }
         }
@@ -250,56 +297,57 @@ namespace SIMS.Student
         {
             using (SqlConnection conn = new SqlConnection(connString))
             {
-                // Pulling required fields into local object frame
                 string query = @"SELECT c.courseName, c.credits, m.score, m.remarks 
                                  FROM Marks m JOIN Courses c ON m.courseID = c.courseID 
                                  WHERE m.studentID = @studentID";
-                SqlCommand cmd = new SqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@studentID", Session["studentID"]);
 
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
-                DataTable dt = new DataTable();
-                da.Fill(dt);
-
-                gvMarks.DataSource = dt;
-                gvMarks.DataBind();
-
-                // 3. Mathematical Credit-Weighted GPA Mapping Engine (Executed strictly in C# code)
-                decimal aggregatedWeightedPoints = 0;
-                int consolidatedCreditDenominator = 0;
-
-                foreach (DataRow row in dt.Rows)
+                using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
-                    if (row["score"] != DBNull.Value)
+                    cmd.Parameters.AddWithValue("@studentID", Session["studentID"]);
+
+                    using (SqlDataAdapter da = new SqlDataAdapter(cmd))
                     {
-                        double rawScore = Convert.ToDouble(row["score"]);
-                        int courseCredits = row["credits"] != DBNull.Value ? Convert.ToInt32(row["credits"]) : 3; // Fallback to standard 3 credits
-                        decimal stepScaleGradePoint = 0.00m;
+                        DataTable dt = new DataTable();
+                        da.Fill(dt);
 
-                        // Linear-to-Step non-linear grading formula translation boundary logic
-                        if (rawScore >= 80) stepScaleGradePoint = 4.00m;
-                        else if (rawScore >= 75) stepScaleGradePoint = 3.67m;
-                        else if (rawScore >= 70) stepScaleGradePoint = 3.33m;
-                        else if (rawScore >= 65) stepScaleGradePoint = 3.00m;
-                        else if (rawScore >= 60) stepScaleGradePoint = 2.67m;
-                        else if (rawScore >= 55) stepScaleGradePoint = 2.33m;
-                        else if (rawScore >= 50) stepScaleGradePoint = 2.00m;
-                        else stepScaleGradePoint = 0.00m;
+                        gvMarks.DataSource = dt;
+                        gvMarks.DataBind();
 
-                        aggregatedWeightedPoints += (stepScaleGradePoint * courseCredits);
-                        consolidatedCreditDenominator += courseCredits;
+                        decimal aggregatedWeightedPoints = 0;
+                        int consolidatedCreditDenominator = 0;
+
+                        foreach (DataRow row in dt.Rows)
+                        {
+                            if (row["score"] != DBNull.Value)
+                            {
+                                double rawScore = Convert.ToDouble(row["score"]);
+                                int courseCredits = row["credits"] != DBNull.Value ? Convert.ToInt32(row["credits"]) : 3;
+                                decimal stepScaleGradePoint = 0.00m;
+
+                                if (rawScore >= 80) stepScaleGradePoint = 4.00m;
+                                else if (rawScore >= 75) stepScaleGradePoint = 3.67m;
+                                else if (rawScore >= 70) stepScaleGradePoint = 3.33m;
+                                else if (rawScore >= 65) stepScaleGradePoint = 3.00m;
+                                else if (rawScore >= 60) stepScaleGradePoint = 2.67m;
+                                else if (rawScore >= 55) stepScaleGradePoint = 2.33m;
+                                else if (rawScore >= 50) stepScaleGradePoint = 2.00m;
+                                else stepScaleGradePoint = 0.00m;
+
+                                aggregatedWeightedPoints += (stepScaleGradePoint * courseCredits);
+                                consolidatedCreditDenominator += courseCredits;
+                            }
+                        }
+
+                        decimal dynamicCalculatedCGPA = consolidatedCreditDenominator > 0
+                            ? (aggregatedWeightedPoints / consolidatedCreditDenominator)
+                            : 0.00m;
+
+                        litCGPA.Text = dynamicCalculatedCGPA.ToString("0.00");
                     }
                 }
-
-                decimal dynamicCalculatedCGPA = consolidatedCreditDenominator > 0
-                    ? (aggregatedWeightedPoints / consolidatedCreditDenominator)
-                    : 0.00m;
-
-                litCGPA.Text = dynamicCalculatedCGPA.ToString("0.00");
             }
         }
 
-        // Intercepts GridView binding at runtime to apply dynamic Pill CSS badges
         protected void gvMarks_RowDataBound(object sender, GridViewRowEventArgs e)
         {
             if (e.Row.RowType == DataControlRowType.DataRow)
@@ -309,7 +357,6 @@ namespace SIMS.Student
                 {
                     string remarkText = lblBadge.Text.Trim().ToUpper();
 
-                    // 1. Core structural styling for an exclusive badge look
                     lblBadge.Style["display"] = "inline-block";
                     lblBadge.Style["padding"] = "6px 12px";
                     lblBadge.Style["border-radius"] = "9999px";
@@ -319,21 +366,20 @@ namespace SIMS.Student
                     lblBadge.Style["letter-spacing"] = "0.05em";
                     lblBadge.Style["text-align"] = "center";
 
-                    // 2. Premium Luxury Color Palette injection based on grades
                     if (remarkText == "FAIL" || remarkText == "RETAKE")
                     {
-                        lblBadge.Style["background-color"] = "#fee2e2"; // Soft luxury red
-                        lblBadge.Style["color"] = "#991b1b";            // Deep crimson text
+                        lblBadge.Style["background-color"] = "#fee2e2";
+                        lblBadge.Style["color"] = "#991b1b";
                     }
                     else if (remarkText == "PASS" || remarkText == "GOOD")
                     {
-                        lblBadge.Style["background-color"] = "#dcfce7"; // Soft luxury emerald green
-                        lblBadge.Style["color"] = "#166534";            // Rich forest green text
+                        lblBadge.Style["background-color"] = "#dcfce7";
+                        lblBadge.Style["color"] = "#166534";
                     }
-                    else // Excellent / Distinction / Top Marks state
+                    else
                     {
-                        lblBadge.Style["background-color"] = "#f3e8ff"; // Soft luxury amethyst purple
-                        lblBadge.Style["color"] = "#6b21a8";            // Royal purple text
+                        lblBadge.Style["background-color"] = "#f3e8ff";
+                        lblBadge.Style["color"] = "#6b21a8";
                     }
                 }
             }
@@ -344,13 +390,16 @@ namespace SIMS.Student
             using (SqlConnection conn = new SqlConnection(connString))
             {
                 string query = "SELECT TOP 3 title, message, datePosted FROM Announcements ORDER BY datePosted DESC";
-                SqlCommand cmd = new SqlCommand(query, conn);
-
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
-                DataTable dt = new DataTable();
-                da.Fill(dt);
-                rptAnnouncements.DataSource = dt;
-                rptAnnouncements.DataBind();
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+                    {
+                        DataTable dt = new DataTable();
+                        da.Fill(dt);
+                        rptAnnouncements.DataSource = dt;
+                        rptAnnouncements.DataBind();
+                    }
+                }
             }
         }
 
@@ -358,9 +407,21 @@ namespace SIMS.Student
         {
             lblStatusMessage.Visible = true;
             lblStatusMessage.Text = text;
-            if (colorTheme == "green") { lblStatusMessage.Style["background-color"] = "#d4edda"; lblStatusMessage.Style["color"] = "#155724"; }
-            else if (colorTheme == "orange") { lblStatusMessage.Style["background-color"] = "#fff3cd"; lblStatusMessage.Style["color"] = "#856404"; }
-            else { lblStatusMessage.Style["background-color"] = "#f8d7da"; lblStatusMessage.Style["color"] = "#721c24"; }
+            if (colorTheme == "green")
+            {
+                lblStatusMessage.Style["background-color"] = "#d4edda";
+                lblStatusMessage.Style["color"] = "#155724";
+            }
+            else if (colorTheme == "orange")
+            {
+                lblStatusMessage.Style["background-color"] = "#fff3cd";
+                lblStatusMessage.Style["color"] = "#856404";
+            }
+            else
+            {
+                lblStatusMessage.Style["background-color"] = "#f8d7da";
+                lblStatusMessage.Style["color"] = "#721c24";
+            }
         }
 
         protected void btnLogout_Click(object sender, EventArgs e)

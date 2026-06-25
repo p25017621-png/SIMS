@@ -3,7 +3,6 @@
 <html lang="en">
 <head runat="server">
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>View Students – SIMS</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
@@ -18,7 +17,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 .logo-text p{color:rgba(255,255,255,.6);font-size:11px;margin-top:2px;}
 .nav-label{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.45);padding:0 10px;margin:18px 0 8px;}
 .nav-item{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:12px;color:rgba(255,255,255,.75);font-size:14px;font-weight:500;cursor:pointer;text-decoration:none;margin-bottom:3px;transition:background .2s,color .2s;}
-.nav-item i{width:18px;text-align:center;font-size:15px;}
+.nav-item i{width:18px;text-align:center;}
 .nav-item:hover,.nav-item.active{background:rgba(255,255,255,.18);color:#fff;}
 .sidebar-footer{margin-top:auto;background:rgba(255,255,255,.12);border-radius:14px;padding:14px;display:flex;align-items:center;gap:12px;}
 .avatar-circle{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.25);color:#fff;font-weight:700;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
@@ -38,13 +37,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 .hero-graphic{width:90px;height:90px;background:rgba(255,255,255,.12);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:38px;position:relative;z-index:1;flex-shrink:0;}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-bottom:28px;}
 .stat-card{background:var(--white);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--card-shadow);display:flex;align-items:center;gap:14px;border-left:4px solid transparent;}
-.stat-card:nth-child(1){border-color:#6c4ef2;} .stat-card:nth-child(2){border-color:#34d399;} .stat-card:nth-child(3){border-color:#f59e0b;} .stat-card:nth-child(4){border-color:#ef4444;}
+.stat-card:nth-child(1){border-color:#6c4ef2;}.stat-card:nth-child(2){border-color:#34d399;}.stat-card:nth-child(3){border-color:#f59e0b;}.stat-card:nth-child(4){border-color:#ef4444;}
 .stat-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
-.stat-card:nth-child(1) .stat-icon{background:#ede9fe;color:#6c4ef2;} .stat-card:nth-child(2) .stat-icon{background:#d1fae5;color:#10b981;} .stat-card:nth-child(3) .stat-icon{background:#fef3c7;color:#d97706;} .stat-card:nth-child(4) .stat-icon{background:#fee2e2;color:#ef4444;}
+.stat-card:nth-child(1) .stat-icon{background:#ede9fe;color:#6c4ef2;}.stat-card:nth-child(2) .stat-icon{background:#d1fae5;color:#10b981;}.stat-card:nth-child(3) .stat-icon{background:#fef3c7;color:#d97706;}.stat-card:nth-child(4) .stat-icon{background:#fee2e2;color:#ef4444;}
 .stat-info h2{font-size:24px;font-weight:700;line-height:1;}
 .stat-info p{font-size:12px;color:var(--muted);margin-top:2px;}
 .table-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--card-shadow);border:1px solid var(--border);overflow:hidden;}
-.table-header{padding:20px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);gap:12px;flex-wrap:wrap;}
+.table-header{padding:20px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:12px;}
 .table-header h3{font-size:15px;font-weight:700;}
 .search-box{display:flex;align-items:center;gap:8px;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:8px 14px;}
 .search-box input{border:none;background:transparent;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);outline:none;width:180px;}
@@ -55,18 +54,12 @@ th{padding:13px 20px;text-align:left;font-size:12px;font-weight:600;color:var(--
 td{padding:13px 20px;font-size:14px;border-top:1px solid var(--border);}
 tr:hover td{background:#faf9ff;}
 .progress-bar{width:100%;height:8px;background:var(--border);border-radius:4px;overflow:hidden;}
-.progress-fill{height:100%;border-radius:4px;transition:width .3s;}
-.fill-green{background:linear-gradient(90deg,#34d399,#10b981);}
-.fill-yellow{background:linear-gradient(90deg,#fbbf24,#f59e0b);}
-.fill-red{background:linear-gradient(90deg,#f87171,#ef4444);}
+.progress-fill{height:100%;border-radius:4px;}
+.fill-green{background:#10b981;}.fill-yellow{background:#f59e0b;}.fill-red{background:#ef4444;}
 .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
-.badge-good{background:#d1fae5;color:#059669;}
-.badge-avg{background:#fef3c7;color:#d97706;}
-.badge-poor{background:#fee2e2;color:#dc2626;}
+.badge-good{background:#d1fae5;color:#059669;}.badge-avg{background:#fef3c7;color:#d97706;}.badge-poor{background:#fee2e2;color:#dc2626;}
 .student-name{display:flex;align-items:center;gap:10px;}
 .mini-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--purple-light));color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
-.hero{animation:fadeUp .5s ease both;} .stats{animation:fadeUp .5s .1s ease both;} .table-card{animation:fadeUp .5s .2s ease both;}
 </style>
 </head>
 <body>
@@ -86,7 +79,6 @@ tr:hover td{background:#faf9ff;}
   <div class="sidebar-footer">
     <div class="avatar-circle">L</div>
     <div class="user-info"><h4>Lecturer</h4><p>Welcome Back!</p></div>
-    <i class="fa-solid fa-chevron-right" style="margin-left:auto;color:rgba(255,255,255,.5);font-size:12px;"></i>
   </div>
 </aside>
 <main class="main">
@@ -98,28 +90,25 @@ tr:hover td{background:#faf9ff;}
     </div>
   </div>
   <div class="hero">
-    <div class="hero-text">
-      <h2>Student Progress 🎓</h2>
-      <p>Monitor academic performance and attendance of your students.</p>
-    </div>
+    <div class="hero-text"><h2>Student Progress 🎓</h2><p>Monitor academic performance and attendance.</p></div>
     <div class="hero-graphic"><i class="fa-solid fa-user-graduate"></i></div>
   </div>
   <div class="stats">
     <div class="stat-card">
       <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
-      <div class="stat-info"><h2>25</h2><p>Total Students</p></div>
+      <div class="stat-info"><h2><asp:Label ID="lblTotal" runat="server" Text="0"/></h2><p>Total Students</p></div>
     </div>
     <div class="stat-card">
       <div class="stat-icon"><i class="fa-solid fa-trophy"></i></div>
-      <div class="stat-info"><h2>15</h2><p>Good Progress</p></div>
+      <div class="stat-info"><h2><asp:Label ID="lblGood" runat="server" Text="0"/></h2><p>Good Progress</p></div>
     </div>
     <div class="stat-card">
       <div class="stat-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
-      <div class="stat-info"><h2>7</h2><p>Average</p></div>
+      <div class="stat-info"><h2><asp:Label ID="lblAvg" runat="server" Text="0"/></h2><p>Average</p></div>
     </div>
     <div class="stat-card">
       <div class="stat-icon"><i class="fa-solid fa-circle-exclamation"></i></div>
-      <div class="stat-info"><h2>3</h2><p>Needs Attention</p></div>
+      <div class="stat-info"><h2><asp:Label ID="lblPoor" runat="server" Text="0"/></h2><p>Needs Attention</p></div>
     </div>
   </div>
   <div class="table-card">
@@ -127,58 +116,40 @@ tr:hover td{background:#faf9ff;}
       <h3>Student Academic Progress</h3>
       <div class="search-box">
         <i class="fa-solid fa-magnifying-glass"></i>
-        <input type="text" placeholder="Search student..."/>
+        <input type="text" id="searchInput" placeholder="Search student..." onkeyup="searchTable()"/>
       </div>
     </div>
-    <table>
+    <table id="stuTable">
       <thead>
-        <tr>
-          <th>Student</th>
-          <th>Student ID</th>
-          <th>Course</th>
-          <th>Attendance %</th>
-          <th>Avg Marks</th>
-          <th>Progress</th>
-          <th>Status</th>
-        </tr>
+        <tr><th>Student</th><th>Course</th><th>Attendance %</th><th>Avg Marks</th><th>Progress</th><th>Status</th></tr>
       </thead>
       <tbody>
-        <tr>
-          <td><div class="student-name"><div class="mini-avatar">A</div>Ahmad Bin Ali</div></td>
-          <td>S001</td><td>Web Programming</td>
-          <td>92%<div class="progress-bar"><div class="progress-fill fill-green" style="width:92%"></div></div></td>
-          <td>85</td>
-          <td><div class="progress-bar"><div class="progress-fill fill-green" style="width:85%"></div></div></td>
-          <td><span class="badge badge-good">Good</span></td>
-        </tr>
-        <tr>
-          <td><div class="student-name"><div class="mini-avatar">S</div>Siti Binti Hassan</div></td>
-          <td>S002</td><td>Database Systems</td>
-          <td>78%<div class="progress-bar"><div class="progress-fill fill-yellow" style="width:78%"></div></div></td>
-          <td>72</td>
-          <td><div class="progress-bar"><div class="progress-fill fill-yellow" style="width:72%"></div></div></td>
-          <td><span class="badge badge-avg">Average</span></td>
-        </tr>
-        <tr>
-          <td><div class="student-name"><div class="mini-avatar">R</div>Raj Kumar</div></td>
-          <td>S003</td><td>Software Engineering</td>
-          <td>95%<div class="progress-bar"><div class="progress-fill fill-green" style="width:95%"></div></div></td>
-          <td>91</td>
-          <td><div class="progress-bar"><div class="progress-fill fill-green" style="width:91%"></div></div></td>
-          <td><span class="badge badge-good">Good</span></td>
-        </tr>
-        <tr>
-          <td><div class="student-name"><div class="mini-avatar">L</div>Lim Wei Ming</div></td>
-          <td>S004</td><td>Web Programming</td>
-          <td>55%<div class="progress-bar"><div class="progress-fill fill-red" style="width:55%"></div></div></td>
-          <td>45</td>
-          <td><div class="progress-bar"><div class="progress-fill fill-red" style="width:45%"></div></div></td>
-          <td><span class="badge badge-poor">Poor</span></td>
-        </tr>
+        <asp:Repeater ID="rptStudents" runat="server">
+          <ItemTemplate>
+            <tr>
+              <td><div class="student-name"><div class="mini-avatar"><%# Eval("Initial") %></div><%# Eval("Name") %></div></td>
+              <td><%# Eval("Course") %></td>
+              <td><%# Eval("AttendancePct") %>%
+                <div class="progress-bar"><div class="progress-fill <%# Eval("FillClass") %>" style="width:<%# Eval("AttendancePct") %>%"></div></div>
+              </td>
+              <td><%# Eval("AvgMarks") %></td>
+              <td><div class="progress-bar"><div class="progress-fill <%# Eval("FillClass") %>" style="width:<%# Eval("AttendancePct") %>%"></div></div></td>
+              <td><span class="badge <%# Eval("BadgeClass") %>"><%# Eval("ProgressStatus") %></span></td>
+            </tr>
+          </ItemTemplate>
+        </asp:Repeater>
       </tbody>
     </table>
   </div>
 </main>
 </form>
+<script>
+    function searchTable() {
+        var val = document.getElementById('searchInput').value.toLowerCase();
+        document.querySelectorAll('#stuTable tbody tr').forEach(function (r) {
+            r.style.display = r.innerText.toLowerCase().includes(val) ? '' : 'none';
+        });
+    }
+</script>
 </body>
 </html>

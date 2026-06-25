@@ -3,7 +3,6 @@
 <html lang="en">
 <head runat="server">
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Manage Marks – SIMS</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
@@ -18,7 +17,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 .logo-text p{color:rgba(255,255,255,.6);font-size:11px;margin-top:2px;}
 .nav-label{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.45);padding:0 10px;margin:18px 0 8px;}
 .nav-item{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:12px;color:rgba(255,255,255,.75);font-size:14px;font-weight:500;cursor:pointer;text-decoration:none;margin-bottom:3px;transition:background .2s,color .2s;}
-.nav-item i{width:18px;text-align:center;font-size:15px;}
+.nav-item i{width:18px;text-align:center;}
 .nav-item:hover,.nav-item.active{background:rgba(255,255,255,.18);color:#fff;}
 .sidebar-footer{margin-top:auto;background:rgba(255,255,255,.12);border-radius:14px;padding:14px;display:flex;align-items:center;gap:12px;}
 .avatar-circle{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.25);color:#fff;font-weight:700;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
@@ -36,14 +35,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 .hero-text h2{font-size:28px;font-weight:700;margin-bottom:8px;}
 .hero-text p{font-size:14px;color:rgba(255,255,255,.8);}
 .hero-graphic{width:90px;height:90px;background:rgba(255,255,255,.12);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:38px;position:relative;z-index:1;flex-shrink:0;}
-.filter-card{background:var(--white);border-radius:var(--radius);padding:22px 24px;box-shadow:var(--card-shadow);border:1px solid var(--border);margin-bottom:24px;display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap;}
+.filter-card{background:var(--white);border-radius:var(--radius);padding:20px 24px;box-shadow:var(--card-shadow);border:1px solid var(--border);margin-bottom:24px;display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap;}
 .filter-group{display:flex;flex-direction:column;gap:6px;}
 .filter-group label{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;}
-.filter-group select,.filter-group input{padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);background:var(--bg);outline:none;min-width:160px;}
-.filter-group select:focus{border-color:var(--purple);background:#fff;}
+.filter-group select{padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);background:var(--bg);outline:none;min-width:200px;}
 .dash-btn{padding:10px 22px;background:linear-gradient(135deg,var(--purple),var(--purple-mid));color:#fff;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 4px 14px rgba(108,78,242,.35);transition:transform .2s;}
 .dash-btn:hover{transform:scale(1.04);}
-.btn-publish{padding:10px 22px;background:linear-gradient(135deg,#10b981,#34d399);color:#fff;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 4px 14px rgba(16,185,129,.35);}
+.btn-publish{padding:10px 22px;background:linear-gradient(135deg,#10b981,#34d399);color:#fff;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;}
 .table-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--card-shadow);border:1px solid var(--border);overflow:hidden;}
 .table-header{padding:20px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
 .table-header h3{font-size:15px;font-weight:700;}
@@ -53,15 +51,12 @@ thead tr{background:var(--bg);}
 th{padding:13px 20px;text-align:left;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;}
 td{padding:10px 20px;font-size:14px;border-top:1px solid var(--border);}
 tr:hover td{background:#faf9ff;}
-.mark-input{width:70px;padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;text-align:center;color:var(--text);background:var(--bg);}
+.mark-input{width:80px;padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;text-align:center;color:var(--text);background:var(--bg);}
 .mark-input:focus{outline:none;border-color:var(--purple);background:#fff;}
+.remarks-input{width:180px;padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);background:var(--bg);}
+.remarks-input:focus{outline:none;border-color:var(--purple);background:#fff;}
 .grade{font-weight:700;font-size:13px;}
-.grade-a{color:#059669;} .grade-b{color:#0ea5e9;} .grade-c{color:#d97706;} .grade-f{color:#dc2626;}
-.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
-.badge-published{background:#d1fae5;color:#059669;}
-.badge-draft{background:#fef3c7;color:#d97706;}
-@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
-.hero{animation:fadeUp .5s ease both;} .filter-card{animation:fadeUp .5s .1s ease both;} .table-card{animation:fadeUp .5s .2s ease both;}
+.grade-a{color:#059669;}.grade-b{color:#0ea5e9;}.grade-c{color:#d97706;}.grade-f{color:#dc2626;}
 </style>
 </head>
 <body>
@@ -81,7 +76,6 @@ tr:hover td{background:#faf9ff;}
   <div class="sidebar-footer">
     <div class="avatar-circle">L</div>
     <div class="user-info"><h4>Lecturer</h4><p>Welcome Back!</p></div>
-    <i class="fa-solid fa-chevron-right" style="margin-left:auto;color:rgba(255,255,255,.5);font-size:12px;"></i>
   </div>
 </aside>
 <main class="main">
@@ -95,89 +89,56 @@ tr:hover td{background:#faf9ff;}
   <div class="hero">
     <div class="hero-text">
       <h2>Assessment Marks 📊</h2>
-      <p>Enter, update and publish marks for your students.</p>
+      <p>Enter and update marks for your students.</p>
     </div>
     <div class="hero-graphic"><i class="fa-solid fa-chart-column"></i></div>
   </div>
   <div class="filter-card">
     <div class="filter-group">
-      <label>Course</label>
-      <asp:DropDownList ID="ddlCourse" runat="server">
-        <asp:ListItem Text="Web Programming (WEB3013)" Value="WEB3013"/>
-        <asp:ListItem Text="Database Systems (DBS2023)" Value="DBS2023"/>
-        <asp:ListItem Text="Software Engineering (SWE3033)" Value="SWE3033"/>
-      </asp:DropDownList>
+      <label>Select Course</label>
+      <asp:DropDownList ID="ddlCourse" runat="server" style="padding:10px 14px;border:1.5px solid #e8e5f5;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;background:#f4f5fb;min-width:220px;"/>
     </div>
-    <div class="filter-group">
-      <label>Assessment</label>
-      <asp:DropDownList ID="ddlAssessment" runat="server">
-        <asp:ListItem Text="Assignment 1" Value="A1"/>
-        <asp:ListItem Text="Assignment 2" Value="A2"/>
-        <asp:ListItem Text="Midterm Exam" Value="MID"/>
-        <asp:ListItem Text="Final Exam" Value="FINAL"/>
-      </asp:DropDownList>
-    </div>
-    <asp:Button ID="btnLoad" runat="server" Text="Load Marks" CssClass="dash-btn" OnClick="btnLoad_Click" />
+    <asp:Button ID="btnLoad" runat="server" Text="Load Students" CssClass="dash-btn" OnClick="btnLoad_Click"/>
   </div>
   <div class="table-card">
     <div class="table-header">
       <h3>Student Marks</h3>
       <div class="btn-row">
-        <asp:Button ID="btnSave" runat="server" Text="💾 Save Marks" CssClass="dash-btn" OnClick="btnSave_Click" />
-        <asp:Button ID="btnPublish" runat="server" Text="✅ Publish" CssClass="btn-publish" OnClick="btnPublish_Click" />
+        <asp:Button ID="btnSave" runat="server" Text="Save Marks" CssClass="dash-btn" OnClick="btnSave_Click"/>
+        <asp:Button ID="btnPublish" runat="server" Text="Publish" CssClass="btn-publish" OnClick="btnPublish_Click"/>
       </div>
     </div>
     <table>
       <thead>
-        <tr>
-          <th>No.</th>
-          <th>Student ID</th>
-          <th>Student Name</th>
-          <th>Marks (/ 100)</th>
-          <th>Grade</th>
-          <th>Status</th>
-        </tr>
+        <tr><th>No.</th><th>Student Name</th><th>Score (/100)</th><th>Grade</th><th>Remarks</th></tr>
       </thead>
       <tbody>
-        <tr>
-          <td>1</td><td>S001</td><td>Ahmad Bin Ali</td>
-          <td><input type="number" class="mark-input" value="85" min="0" max="100" onchange="updateGrade(this)"/></td>
-          <td><span class="grade grade-a">A</span></td>
-          <td><span class="badge badge-published">Published</span></td>
-        </tr>
-        <tr>
-          <td>2</td><td>S002</td><td>Siti Binti Hassan</td>
-          <td><input type="number" class="mark-input" value="72" min="0" max="100" onchange="updateGrade(this)"/></td>
-          <td><span class="grade grade-b">B</span></td>
-          <td><span class="badge badge-draft">Draft</span></td>
-        </tr>
-        <tr>
-          <td>3</td><td>S003</td><td>Raj Kumar</td>
-          <td><input type="number" class="mark-input" value="91" min="0" max="100" onchange="updateGrade(this)"/></td>
-          <td><span class="grade grade-a">A</span></td>
-          <td><span class="badge badge-published">Published</span></td>
-        </tr>
-        <tr>
-          <td>4</td><td>S004</td><td>Lim Wei Ming</td>
-          <td><input type="number" class="mark-input" value="55" min="0" max="100" onchange="updateGrade(this)"/></td>
-          <td><span class="grade grade-c">C</span></td>
-          <td><span class="badge badge-draft">Draft</span></td>
-        </tr>
+        <asp:Repeater ID="rptMarks" runat="server">
+          <ItemTemplate>
+            <tr>
+              <td><%# Container.ItemIndex + 1 %></td>
+              <td><%# Eval("StudentName") %></td>
+              <td><input type="number" class="mark-input" value="<%# Eval("Marks") %>" min="0" max="100" onchange="updateGrade(this)"/></td>
+             <td><span class="grade <%# Convert.ToDecimal(Eval("Marks")) >= 80 ? "grade-a" : Convert.ToDecimal(Eval("Marks")) >= 70 ? "grade-b" : Convert.ToDecimal(Eval("Marks")) >= 60 ? "grade-c" : "grade-f" %>"><%# Eval("Grade") %></span></td>
+              <td><input type="text" class="remarks-input" value="<%# Eval("Remarks") %>" placeholder="Remarks..."/></td>
+            </tr>
+          </ItemTemplate>
+        </asp:Repeater>
       </tbody>
     </table>
   </div>
 </main>
 </form>
 <script>
-function updateGrade(input) {
-  var val = parseInt(input.value);
-  var row = input.closest('tr');
-  var gradeEl = row.querySelector('.grade');
-  var g = val >= 80 ? 'A' : val >= 70 ? 'B' : val >= 60 ? 'C' : val >= 50 ? 'D' : 'F';
-  var cls = val >= 80 ? 'grade-a' : val >= 70 ? 'grade-b' : val >= 60 ? 'grade-c' : 'grade-f';
-  gradeEl.textContent = g;
-  gradeEl.className = 'grade ' + cls;
-}
+    function updateGrade(input) {
+        var val = parseInt(input.value);
+        var row = input.closest('tr');
+        var gradeEl = row.querySelector('.grade');
+        var g = val >= 80 ? 'A' : val >= 70 ? 'B' : val >= 60 ? 'C' : val >= 50 ? 'D' : 'F';
+        var cls = val >= 80 ? 'grade-a' : val >= 70 ? 'grade-b' : val >= 60 ? 'grade-c' : 'grade-f';
+        gradeEl.textContent = g;
+        gradeEl.className = 'grade ' + cls;
+    }
 </script>
 </body>
 </html>

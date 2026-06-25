@@ -1,8 +1,8 @@
-﻿
-using System;
+﻿using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.Web.UI;
+using System.Web.UI.WebControls;
 
 namespace SIMS.Lecturer
 {
@@ -10,91 +10,117 @@ namespace SIMS.Lecturer
     {
         string connStr = System.Web.Configuration.WebConfigurationManager
                          .ConnectionStrings["SIMSConnection"].ConnectionString;
+        int lecturerID = 1;
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (!IsPostBack)
-            {
-                LoadAnnouncements();
-            }
+            if (!IsPostBack) LoadAnnouncements();
         }
 
-        // Load existing announcements
         private void LoadAnnouncements()
         {
-            // Real DB:
-            // string lecturerID = Session["LecturerID"]?.ToString();
-            // using (SqlConnection con = new SqlConnection(connStr))
-            // {
-            //     con.Open();
-            //     string sql = @"SELECT AnnouncementID, Title, Message, Target, Type,
-            //                    PostedDate FROM Announcements
-            //                    WHERE LecturerID = @lid
-            //                    ORDER BY PostedDate DESC";
-            //     SqlCommand cmd = new SqlCommand(sql, con);
-            //     cmd.Parameters.AddWithValue("@lid", lecturerID);
-            //     SqlDataAdapter da = new SqlDataAdapter(cmd);
-            //     DataTable dt = new DataTable();
-            //     da.Fill(dt);
-            //     // Bind to Repeater
-            // }
-        }
-
-        // Post new announcement
-        protected void btnPost_Click(object sender, EventArgs e)
-        {
-            if (string.IsNullOrWhiteSpace(txtTitle.Text) ||
-                string.IsNullOrWhiteSpace(txtMessage.Text))
-            {
-                lblMessage.Text = "⚠️ Please fill in title and message.";
-                lblMessage.ForeColor = System.Drawing.Color.Red;
-                return;
-            }
-
             try
             {
-                // Real DB:
-                // using (SqlConnection con = new SqlConnection(connStr))
-                // {
-                //     con.Open();
-                //     string sql = @"INSERT INTO Announcements
-                //                    (LecturerID, Title, Message, Target, Type, PostedDate)
-                //                    VALUES (@lid, @title, @msg, @target, @type, GETDATE())";
-                //     SqlCommand cmd = new SqlCommand(sql, con);
-                //     cmd.Parameters.AddWithValue("@lid",    Session["LecturerID"]);
-                //     cmd.Parameters.AddWithValue("@title",  txtTitle.Text.Trim());
-                //     cmd.Parameters.AddWithValue("@msg",    txtMessage.Text.Trim());
-                //     cmd.Parameters.AddWithValue("@target", ddlTarget.SelectedValue);
-                //     cmd.Parameters.AddWithValue("@type",   ddlType.SelectedValue);
-                //     cmd.ExecuteNonQuery();
-                // }
+                using (SqlConnection con = new SqlConnection(connStr))
+                {
+                    con.Open();
+                    string sql = @"SELECT announcementID, title, message, datePosted
+                                   FROM Announcements
+                                   WHERE lecturerID = @lid
+                                   ORDER BY datePosted DESC";
+                    SqlCommand cmd = new SqlCommand(sql, con);
+                    cmd.Parameters.AddWithValue("@lid", lecturerID);
+                    SqlDataAdapter da = new SqlDataAdapter(cmd);
+                    DataTable dt = new DataTable();
+                    da.Fill(dt);
+                    if (dt.Rows.Count > 0)
+                    {
+                        rptAnnouncements.DataSource = dt;
+                        rptAnnouncements.DataBind();
+                        lblCount.Text = dt.Rows.Count.ToString();
+                        pnlEmpty.Visible = false;
+                    }
+                    else
+                    {
+                        rptAnnouncements.DataSource = null;
+                        rptAnnouncements.DataBind();
+                        lblCount.Text = "0";
+                        pnlEmpty.Visible = true;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                pnlError.Visible = true;
+                lblError.Text = ex.Message;
+            }
+        }
 
-                lblMessage.Text = "✅ Announcement posted successfully!";
-                lblMessage.ForeColor = System.Drawing.Color.FromArgb(5, 150, 105);
-
-                // Clear form
+        protected void btnPost_Click(object sender, EventArgs e)
+        {
+            pnlSuccess.Visible = false;
+            pnlError.Visible = false;
+            if (string.IsNullOrWhiteSpace(txtTitle.Text) || string.IsNullOrWhiteSpace(txtMessage.Text))
+            {
+                pnlError.Visible = true;
+                lblError.Text = "Please fill in both Title and Message!";
+                return;
+            }
+            try
+            {
+                using (SqlConnection con = new SqlConnection(connStr))
+                {
+                    con.Open();
+                    string sql = @"INSERT INTO Announcements (lecturerID, title, message, datePosted)
+                                   VALUES (@lid, @title, @msg, CAST(GETDATE() AS DATE))";
+                    SqlCommand cmd = new SqlCommand(sql, con);
+                    cmd.Parameters.AddWithValue("@lid", lecturerID);
+                    cmd.Parameters.AddWithValue("@title", txtTitle.Text.Trim());
+                    cmd.Parameters.AddWithValue("@msg", txtMessage.Text.Trim());
+                    cmd.ExecuteNonQuery();
+                }
+                pnlSuccess.Visible = true;
                 txtTitle.Text = "";
                 txtMessage.Text = "";
-                ddlTarget.SelectedIndex = 0;
-                ddlType.SelectedIndex = 0;
-
                 LoadAnnouncements();
             }
             catch (Exception ex)
             {
-                lblMessage.Text = "❌ Error: " + ex.Message;
-                lblMessage.ForeColor = System.Drawing.Color.Red;
+                pnlError.Visible = true;
+                lblError.Text = "Error: " + ex.Message;
             }
         }
 
-        // Clear the form
+        protected void rptAnnouncements_ItemCommand(object source, RepeaterCommandEventArgs e)
+        {
+            if (e.CommandName == "DeleteAnn")
+            {
+                try
+                {
+                    using (SqlConnection con = new SqlConnection(connStr))
+                    {
+                        con.Open();
+                        string sql = "DELETE FROM Announcements WHERE announcementID = @id";
+                        SqlCommand cmd = new SqlCommand(sql, con);
+                        cmd.Parameters.AddWithValue("@id", Convert.ToInt32(e.CommandArgument));
+                        cmd.ExecuteNonQuery();
+                    }
+                    LoadAnnouncements();
+                }
+                catch (Exception ex)
+                {
+                    pnlError.Visible = true;
+                    lblError.Text = "Error deleting: " + ex.Message;
+                }
+            }
+        }
+
         protected void btnClear_Click(object sender, EventArgs e)
         {
             txtTitle.Text = "";
             txtMessage.Text = "";
-            ddlTarget.SelectedIndex = 0;
-            ddlType.SelectedIndex = 0;
-            lblMessage.Text = "";
+            pnlSuccess.Visible = false;
+            pnlError.Visible = false;
         }
     }
 }

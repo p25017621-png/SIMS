@@ -6,104 +6,134 @@
 
 <head runat="server">
 
-    <title>SIMS Dashboard</title>
+<title>SIMS Dashboard</title>
 
-    <!-- CSS -->
-    <link href="../Assets/CSS/global.css" rel="stylesheet" />
-    <link href="../Assets/CSS/dashboard.css" rel="stylesheet" />
-    <link href="../Assets/CSS/sidebar.css" rel="stylesheet" />
-    <link href="../Assets/CSS/components.css" rel="stylesheet" />
+<!-- CSS -->
+<link href="/Assets/CSS/global.css" rel="stylesheet" />
+<link href="/Assets/CSS/dashboard.css" rel="stylesheet" />
+<link href="/Assets/CSS/sidebar.css" rel="stylesheet" />
+<link href="/Assets/CSS/components.css" rel="stylesheet" />
 
-    <!-- Google Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet" />
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet" />
+
 
 </head>
 
 <body>
 
-    <form id="form1" runat="server">
+<form id="form1" runat="server">
 
-        <div class="dashboard-layout">
+    <div class="dashboard-layout">
 
-            <!-- SIDEBAR -->
-            <aside class="sidebar glass-card">
+        <!-- SIDEBAR -->
+        <aside class="sidebar glass-card">
 
-                <div class="logo-section">
+            <div class="logo-section">
+    <h2 class="logo-text">SIMS</h2>
+</div>
 
-                    <h2 class="logo-text">
-                        SIMS
-                    </h2>
+            <!-- SIDEBAR NAVIGATION -->
+            <nav class="sidebar-nav">
 
-                </div>
+                <a href="/Admin/AdminDashboard.aspx" 
+                    class="nav-item active">
+                    Dashboard
+                </a>
 
-                <nav class="sidebar-nav">
-                    <a href="StudentDashboard.aspx" class="nav-item">
-                        Dashboard
+                <a href="/Student/StudentDashboard.aspx"
+                   class="nav-item">
+                    Students
+                </a>
+
+                <a href="/Lecturer/LecturerDashboard.aspx"
+                   class="nav-item">
+                    Lecturers
+                </a>
+
+                <a href="/Admin/CourseManagement.aspx"
+                   class="nav-item">
+                    Courses
+                </a>
+
+                <a href="/Admin/ProgrammeManagement.aspx"
+                   class="nav-item">
+                    Programmes
+                </a>
+
+                <a href="/Admin/AssignLecturer.aspx"
+                   class="nav-item">
+                   Assign Lecturer
+                </a>
+    
+
+                <a href="/Admin/Reports.aspx"
+                   class ="nav-item">
+                    Reports
                     </a>
-                    <a href="Students.aspx" class="nav-item">
-                        Students
-                    </a>
-                    <a href="Lecturers.aspx" class="nav-item">
-                        Lecturers
-                    </a>
-                </nav>
+                <a href="/Admin/EnrolmentManagement.aspx"
+                   class="nav-item">
+                   Enrolments
+               </a>
 
-                <div class="sidebar-footer">
+            </nav>
 
-                    <asp:Button ID="btnLogout"
-                        runat="server"
-                        Text="Logout"
-                        CssClass="logout-btn"
-                        OnClick="btnLogout_Click" />
+            <!-- LOGOUT -->
+            <div class="sidebar-footer">
 
-                </div>
+                <asp:Button ID="btnLogout"
+                    runat="server"
+                    Text="Logout"
+                    CssClass="logout-btn"
+                    OnClick="btnLogout_Click" />
 
-            </aside>
+            </div>
 
-            <!-- MAIN CONTENT -->
-            <main class="main-content">
+        </aside>
 
-                <!-- TOPBAR -->
-                <div class="topbar glass-card">
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
 
-                    <div>
+            <!-- TOPBAR -->
+            <div class="topbar glass-card">
 
-                        <h1 class="page-title">
-                            Dashboard
-                        </h1>
+                <div>
 
-                        <p class="page-subtitle">
-                            Welcome back to SIMS
-                        </p>
+                   <h1 class="page-title">
+                        <%= Page.Title %>
+                          </h1>
 
+                   <p class="page-subtitle">
+                        Student Information Management System
+                   </p>
+
+                 </div>
+
+                <div class="profile-box">
+
+                    <div class="profile-avatar">
+                        R
                     </div>
 
-                    <div class="profile-box">
-
-                        <div class="profile-avatar">
-                            R
-                        </div>
-
-                    </div>
-
                 </div>
 
-                <!-- PAGE CONTENT -->
-                <div class="page-content">
+            </div>
 
-                    <asp:ContentPlaceHolder ID="MainContent"
-                        runat="server">
+            <!-- PAGE CONTENT -->
+            <div class="page-content">
 
-                    </asp:ContentPlaceHolder>
+                <asp:ContentPlaceHolder ID="MainContent"
+                    runat="server">
+                </asp:ContentPlaceHolder>
 
-                </div>
+            </div>
 
-            </main>
+        </main>
 
-        </div>
+    </div>
 
-    </form>
+</form>
 
 </body>
 

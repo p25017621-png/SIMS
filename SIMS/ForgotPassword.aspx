@@ -84,11 +84,13 @@
                 </div>
 
                 <!-- RESET BUTTON -->
+                <div style="text-align: center; width: 100%;">
                 <asp:Button ID="btnResetPassword"
                     runat="server"
                     Text="Reset Password"
                     CssClass="primary-btn"
                     OnClick="btnResetPassword_Click" />
+                </div>
 
                 <asp:Label ID="lblMessage"
                     runat="server"

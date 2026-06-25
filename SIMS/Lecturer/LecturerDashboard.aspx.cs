@@ -1,15 +1,13 @@
 ﻿using System;
+using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
-using System.Web.UI;
 
 namespace SIMS.Lecturer
 {
     public partial class LecturerDashboard : Page
     {
-        string connStr = System.Web.Configuration.WebConfigurationManager
-                         .ConnectionStrings["SIMSConnection"].ConnectionString;
-        int lecturerID = 1;
+
 
         protected void Page_Load(object sender, EventArgs e)
         {

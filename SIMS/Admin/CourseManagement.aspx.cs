@@ -20,34 +20,6 @@ namespace SIMS.Admin
             }
         }
 
-        // LOAD COURSES
-        void LoadCourses()
-        {
-            SqlConnection con =
-                new SqlConnection(connectionString);
-
-            string query = @"
-SELECT
-    c.courseName,
-    c.description,
-    c.credits,
-    p.programmeName
-FROM Courses c
-INNER JOIN Programmes p
-ON c.programmeID = p.programmeID";
-
-            SqlDataAdapter da =
-                new SqlDataAdapter(query, con);
-
-            DataTable dt =
-                new DataTable();
-
-            da.Fill(dt);
-
-            gvCourses.DataSource = dt;
-            gvCourses.DataBind();
-        }
-
         // LOAD PROGRAMME
         void LoadProgrammes()
         {
@@ -71,6 +43,37 @@ ON c.programmeID = p.programmeID";
             ddlProgramme.DataBind();
         }
 
+        // LOAD COURSES
+        void LoadCourses()
+        {
+            SqlConnection con =
+                new SqlConnection(connectionString);
+
+            string query = @"
+SELECT
+    c.courseID,
+    c.courseName,
+    c.courseCode,
+    c.credits,
+    p.programmeName
+FROM Courses c
+INNER JOIN Programmes p
+ON c.programmeID = p.programmeID";
+
+            SqlDataAdapter da =
+                new SqlDataAdapter(query, con);
+
+            DataTable dt =
+                new DataTable();
+
+            da.Fill(dt);
+
+            gvCourses.DataSource = dt;
+            gvCourses.DataBind();
+        }
+
+
+
         // ADD COURSE
         protected void btnAdd_Click(object sender, EventArgs e)
         {
@@ -78,15 +81,15 @@ ON c.programmeID = p.programmeID";
                 new SqlConnection(connectionString);
 
             string query =
-          "INSERT INTO Courses(courseName, description, credits, programmeID) " +
-          "VALUES(@courseName, @description, @credits, @programmeID)";
+          "INSERT INTO Courses(courseName, courseCode, credits, programmeID) " +
+          "VALUES(@courseName, @courseCode, @credits, @programmeID)";
 
             SqlCommand cmd =
                 new SqlCommand(query, con);
 
             cmd.Parameters.AddWithValue("@courseName", txtCourseName.Text);
-            cmd.Parameters.AddWithValue("@description", txtDescription.Text);
-            cmd.Parameters.AddWithValue("@credits", txtCredits.Text);
+            cmd.Parameters.AddWithValue("@courseCode", txtCourseCode.Text);
+            cmd.Parameters.AddWithValue("@credits", Convert.ToInt32(txtCredits.Text));
             cmd.Parameters.AddWithValue("@programmeID", ddlProgramme.SelectedValue);
 
             con.Open();
@@ -103,7 +106,7 @@ ON c.programmeID = p.programmeID";
         protected void btnClear_Click(object sender, EventArgs e)
         {
             txtCourseName.Text = "";
-            txtDescription.Text = "";
+            txtCourseCode.Text = "";
             txtCredits.Text = "";
 
             ddlProgramme.SelectedIndex = 0;
@@ -114,112 +117,99 @@ ON c.programmeID = p.programmeID";
         // DELETE COURSE
         protected void gvCourses_RowDeleting(object sender, GridViewDeleteEventArgs e)
         {
-            string courseName =
-                gvCourses.DataKeys[e.RowIndex].Value.ToString();
+            int courseID = Convert.ToInt32(gvCourses.DataKeys[e.RowIndex].Value);
 
-            SqlConnection con =
-                new SqlConnection(connectionString);
+            using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                con.Open();
 
-            con.Open();
+                try
+                {
+                    // Delete lecturer assignments first (FK safety)
+                    string deleteAssignment =
+                        "DELETE FROM LecturerCourseAssignments WHERE courseID=@id";
 
-            // Delete lecturer assignment first
-            string deleteAssignment =
-                @"DELETE FROM LecturerCourseAssignments
-          WHERE courseID =
-          (SELECT courseID
-           FROM Courses
-           WHERE courseName=@courseName)";
+                    SqlCommand cmd1 = new SqlCommand(deleteAssignment, con);
+                    cmd1.Parameters.AddWithValue("@id", courseID);
+                    cmd1.ExecuteNonQuery();
 
-            SqlCommand cmd1 =
-                new SqlCommand(deleteAssignment, con);
+                    // Delete course
+                    string deleteCourse =
+                        "DELETE FROM Courses WHERE courseID=@id";
 
-            cmd1.Parameters.AddWithValue("@courseName", courseName);
+                    SqlCommand cmd2 = new SqlCommand(deleteCourse, con);
+                    cmd2.Parameters.AddWithValue("@id", courseID);
+                    cmd2.ExecuteNonQuery();
 
-            cmd1.ExecuteNonQuery();
-
-            // Delete course
-            string deleteCourse =
-                "DELETE FROM Courses WHERE courseName=@courseName";
-
-            SqlCommand cmd2 =
-                new SqlCommand(deleteCourse, con);
-
-            cmd2.Parameters.AddWithValue("@courseName", courseName);
-
-            cmd2.ExecuteNonQuery();
-
-            con.Close();
+                    lblMessage.Text = "Course Deleted Successfully!";
+                }
+                catch (Exception ex)
+                {
+                    lblMessage.Text = ex.Message;
+                }
+            }
 
             lblMessage.Text =
                 "Course Deleted Successfully!";
 
             LoadCourses();
         }
-        protected void gvCourses_RowEditing(
-    object sender,
-    GridViewEditEventArgs e)
+        protected void gvCourses_RowEditing(object sender, GridViewEditEventArgs e)
         {
             gvCourses.EditIndex = e.NewEditIndex;
 
             LoadCourses();
         }
 
-        protected void gvCourses_RowCancelingEdit(
-            object sender,
-            GridViewCancelEditEventArgs e)
+        protected void gvCourses_RowCancelingEdit(object sender, GridViewCancelEditEventArgs e)
         {
             gvCourses.EditIndex = -1;
 
             LoadCourses();
         }
 
-        protected void gvCourses_RowUpdating(
-            object sender,
-            GridViewUpdateEventArgs e)
+        protected void gvCourses_RowUpdating(object sender, GridViewUpdateEventArgs e)
         {
-            string oldCourseName =
-                gvCourses.DataKeys[e.RowIndex].Value.ToString();
+            int courseID = Convert.ToInt32(gvCourses.DataKeys[e.RowIndex].Value);
 
-            string courseName =
-                ((TextBox)gvCourses.Rows[e.RowIndex]
-                .Cells[0].Controls[0]).Text;
+            GridViewRow row = gvCourses.Rows[e.RowIndex];
 
-            string description =
-                ((TextBox)gvCourses.Rows[e.RowIndex]
-                .Cells[1].Controls[0]).Text;
+            string courseName = ((TextBox)row.Cells[1].Controls[0]).Text;
+            string courseCode = ((TextBox)row.Cells[2].Controls[0]).Text;
+            string creditsText = ((TextBox)row.Cells[3].Controls[0]).Text;
 
-            string credits =
-                ((TextBox)gvCourses.Rows[e.RowIndex]
-                .Cells[2].Controls[0]).Text;
+            using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                con.Open();
 
-            SqlConnection con =
-                new SqlConnection(connectionString);
+                try
+                {
+                    string query = @"UPDATE Courses 
+                             SET courseName=@name, 
+                                 courseCode=@code, 
+                                 credits=@credits
+                             WHERE courseID=@id";
 
-            string query =
-                "UPDATE Courses " +
-                "SET courseName=@courseName, " +
-                "description=@description, " +
-                "credits=@credits " +
-                "WHERE courseName=@oldCourseName";
+                    SqlCommand cmd = new SqlCommand(query, con);
 
-            SqlCommand cmd =
-                new SqlCommand(query, con);
+                    cmd.Parameters.AddWithValue("@name", courseName);
+                    cmd.Parameters.AddWithValue("@code", courseCode);
+                    cmd.Parameters.AddWithValue("@credits", Convert.ToInt32(creditsText));
+                    cmd.Parameters.AddWithValue("@id", courseID);
 
-            cmd.Parameters.AddWithValue("@courseName", courseName);
-            cmd.Parameters.AddWithValue("@description", description);
-            cmd.Parameters.AddWithValue("@credits", credits);
-            cmd.Parameters.AddWithValue("@oldCourseName", oldCourseName);
-
-            con.Open();
-
-            cmd.ExecuteNonQuery();
+                    cmd.ExecuteNonQuery();
 
             con.Close();
 
-            gvCourses.EditIndex = -1;
+                    gvCourses.EditIndex = -1;
 
-            lblMessage.Text =
-                "Course Updated Successfully!";
+                    lblMessage.Text = "Course Updated Successfully!";
+                }
+                catch (Exception ex)
+                {
+                    lblMessage.Text = ex.Message;
+                }
+            }
 
             LoadCourses();
         }

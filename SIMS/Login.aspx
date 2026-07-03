@@ -71,14 +71,14 @@
                 </div>
 
                 <!-- Login Button -->
+                <div style="text-align: center; width: 100%;">
                 <asp:Button ID="btnLogin"
                     runat="server"
                     Text="Login"
                     CssClass="primary-btn"
                     OnClick="btnLogin_Click" />
-
-                <div style="margin-top:18px; text-align:center;">
-
+                  </div>
+                <div style="margin-top:18px; text-align:center; width: 100%;">
                 <a href="ForgotPassword.aspx"
                   style="text-decoration:none; color:#6366f1; font-weight:600;">
                   Forgot Password?

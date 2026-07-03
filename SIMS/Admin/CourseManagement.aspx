@@ -21,9 +21,9 @@
             Placeholder="Course Name">
         </asp:TextBox>
 
-        <asp:TextBox ID="txtDescription"
+        <asp:TextBox ID="txtCourseCode"
             runat="server"
-            Placeholder="Description">
+            Placeholder="Course Code">
         </asp:TextBox>
 
         <asp:TextBox ID="txtCredits"
@@ -31,8 +31,9 @@
             Placeholder="Credits">
         </asp:TextBox>
 
-        <asp:DropDownList ID="ddlProgramme"
-            runat="server">
+      <!-- Programme Dropdown -->
+        <asp:DropDownList ID="ddlProgramme" runat="server" AppendDataBoundItems="true">
+        <asp:ListItem Text="-- Select a Program --" Value="" />
         </asp:DropDownList>
 
         <br /><br />
@@ -73,7 +74,7 @@
     CssClass="styled-grid"
     Width="100%"
     GridLines="None"
-    DataKeyNames="courseName"
+    DataKeyNames="courseID"
     OnRowDeleting="gvCourses_RowDeleting"
     OnRowEditing="gvCourses_RowEditing"
     OnRowUpdating="gvCourses_RowUpdating"
@@ -81,13 +82,15 @@
 
     <Columns>
 
+        <asp:BoundField DataField="courseID" HeaderText="ID" ReadOnly="true" />
+
         <asp:BoundField
             DataField="courseName"
             HeaderText="Course Name" />
 
         <asp:BoundField
-            DataField="description"
-            HeaderText="Description" />
+            DataField="courseCode"
+            HeaderText="Course Code" />
 
         <asp:BoundField
             DataField="credits"

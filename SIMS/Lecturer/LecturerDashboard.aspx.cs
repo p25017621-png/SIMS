@@ -5,7 +5,7 @@ using System.Data.SqlClient;
 
 namespace SIMS.Lecturer
 {
-    public partial class LecturerDashboard : System.Web.UI.Page
+    public partial class LecturerDashboard : Page
     {
 
 
@@ -13,80 +13,57 @@ namespace SIMS.Lecturer
         {
             if (!IsPostBack)
             {
-                LoadStatistics();
-                LoadAssignments();
-            }
-        }
-        private void LoadStatistics()
-
-        {
-            string cs =
-                ConfigurationManager.ConnectionStrings["SIMSConnection"].ConnectionString;
-
-            using (SqlConnection conn = new SqlConnection(cs))
-            {
-                conn.Open();
-
-                SqlCommand cmd1 =
-                    new SqlCommand("SELECT COUNT(*) FROM Lecturers", conn);
-
-                lblLecturers.Text =
-                    cmd1.ExecuteScalar().ToString();
-
-                SqlCommand cmd2 =
-                    new SqlCommand("SELECT COUNT(*) FROM Courses", conn);
-
-                lblCourses.Text =
-                    cmd2.ExecuteScalar().ToString();
-
-                SqlCommand cmd3 =
-    new SqlCommand("SELECT COUNT(*) FROM LecturerCourseAssignments", conn);
-
-                lblAssignments.Text =
-                    cmd3.ExecuteScalar().ToString();
-            }
-         
-        }
-            private void LoadAssignments()
-        {
-            string cs =
-                ConfigurationManager.ConnectionStrings["SIMSConnection"].ConnectionString;
-
-            using (SqlConnection conn = new SqlConnection(cs))
-            {
-                string query = @"
-        SELECT
-        c.courseName,
-        p.programmeName,
-        a.semester
-        FROM LecturerCourseAssignments a
-        JOIN Courses c
-            ON a.courseID = c.courseID
-        JOIN Programmes p
-            ON c.programmeID = p.programmeID";
-
-                SqlDataAdapter da =
-                    new SqlDataAdapter(query, conn);
-
-                DataTable dt =
-                    new DataTable();
-
-                da.Fill(dt);
-
-                gvAssignments.DataSource = dt;
-                gvAssignments.DataBind();
+                LoadStats();
             }
         
         }
 
-
-
-        protected void btnLogout_Click(object sender, EventArgs e)
+        private void LoadStats()
         {
-            Session.Clear();
-            Session.Abandon();
+            try
+            {
+                using (SqlConnection con = new SqlConnection(connStr))
+                {
+                    con.Open();
 
-            Response.Redirect("~/Login.aspx");
+                    string sql1 = @"SELECT COUNT(DISTINCT e.studentID)
+                                    FROM Enrolments e
+                                    JOIN LecturerCourseAssignments lca ON e.courseID = lca.courseID
+                                    WHERE lca.lecturerID = @lid";
+                    SqlCommand cmd1 = new SqlCommand(sql1, con);
+                    cmd1.Parameters.AddWithValue("@lid", lecturerID);
+                    lblTotalStudents.Text = cmd1.ExecuteScalar().ToString();
+
+                    string sql2 = @"SELECT COUNT(*)
+                                    FROM Attendance a
+                                    JOIN LecturerCourseAssignments lca ON a.courseID = lca.courseID
+                                    WHERE lca.lecturerID = @lid";
+                    SqlCommand cmd2 = new SqlCommand(sql2, con);
+                    cmd2.Parameters.AddWithValue("@lid", lecturerID);
+                    lblTotalAttendance.Text = cmd2.ExecuteScalar().ToString();
+
+                    string sql3 = @"SELECT COUNT(*)
+                                    FROM Marks m
+                                    JOIN LecturerCourseAssignments lca ON m.courseID = lca.courseID
+                                    WHERE lca.lecturerID = @lid";
+                    SqlCommand cmd3 = new SqlCommand(sql3, con);
+                    cmd3.Parameters.AddWithValue("@lid", lecturerID);
+                    lblTotalMarks.Text = cmd3.ExecuteScalar().ToString();
+                }
+            }
+            catch
+            {
+                lblTotalStudents.Text = "0";
+                lblTotalAttendance.Text = "0";
+                lblTotalMarks.Text = "0";
+            }
         }
+
+        protected void btnAttendance_Click(object sender, EventArgs e) { Response.Redirect("~/Lecturer/ManageAttendance.aspx"); }
+        protected void btnMarks_Click(object sender, EventArgs e) { Response.Redirect("~/Lecturer/ManageMarks.aspx"); }
+        protected void btnStudents_Click(object sender, EventArgs e) { Response.Redirect("~/Lecturer/ViewStudents.aspx"); }
+        protected void btnProfile_Click(object sender, EventArgs e) { Response.Redirect("~/Lecturer/ManageProfile.aspx"); }
+        protected void btnCourses_Click(object sender, EventArgs e) { Response.Redirect("~/Lecturer/ViewCourses.aspx"); }
+        protected void btnAnnouncement_Click(object sender, EventArgs e) { Response.Redirect("~/Lecturer/Announcements.aspx"); }
     }
 }

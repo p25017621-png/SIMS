@@ -7,48 +7,48 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SIMS
+namespace SIMS.Admin
 {
 
 
-    public partial class Login
+    public partial class ProgrammeManagement
     {
 
         /// <summary>
-        /// form1 control.
+        /// txtProgramName control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlForm form1;
+        protected global::System.Web.UI.WebControls.TextBox txtProgramName;
 
         /// <summary>
-        /// txtEmail control.
+        /// txtProgramCode control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtEmail;
+        protected global::System.Web.UI.WebControls.TextBox txtProgramCode;
 
         /// <summary>
-        /// txtPassword control.
+        /// btnAddProgram control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtPassword;
+        protected global::System.Web.UI.WebControls.Button btnAddProgram;
 
         /// <summary>
-        /// btnLogin control.
+        /// btnClear control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnLogin;
+        protected global::System.Web.UI.WebControls.Button btnClear;
 
         /// <summary>
         /// lblMessage control.
@@ -58,5 +58,14 @@ namespace SIMS
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label lblMessage;
+
+        /// <summary>
+        /// gvPrograms control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.GridView gvPrograms;
     }
 }

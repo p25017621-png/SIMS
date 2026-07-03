@@ -7,48 +7,48 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SIMS
+namespace SIMS.Admin
 {
 
 
-    public partial class Login
+    public partial class AssignLecturer
     {
 
         /// <summary>
-        /// form1 control.
+        /// ddlLecturer control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlForm form1;
+        protected global::System.Web.UI.WebControls.DropDownList ddlLecturer;
 
         /// <summary>
-        /// txtEmail control.
+        /// ddlSemester control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtEmail;
+        protected global::System.Web.UI.WebControls.DropDownList ddlSemester;
 
         /// <summary>
-        /// txtPassword control.
+        /// cblCourses control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtPassword;
+        protected global::System.Web.UI.WebControls.CheckBoxList cblCourses;
 
         /// <summary>
-        /// btnLogin control.
+        /// btnAssign control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button btnLogin;
+        protected global::System.Web.UI.WebControls.Button btnAssign;
 
         /// <summary>
         /// lblMessage control.
@@ -58,5 +58,14 @@ namespace SIMS
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label lblMessage;
+
+        /// <summary>
+        /// gvAssign control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.GridView gvAssign;
     }
 }

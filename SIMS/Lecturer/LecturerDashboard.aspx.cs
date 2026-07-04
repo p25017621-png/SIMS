@@ -1,19 +1,23 @@
-﻿using System;
-using System.Configuration;
+﻿
+using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.Web.UI;
 
 namespace SIMS.Lecturer
 {
     public partial class LecturerDashboard : Page
     {
-
+        string connStr = System.Web.Configuration.WebConfigurationManager
+                         .ConnectionStrings["SIMSConnection"].ConnectionString;
+        int lecturerID = 1;
 
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
             {
                 LoadStats();
+                LoadNotifications();
             }
         }
 
@@ -55,6 +59,45 @@ namespace SIMS.Lecturer
                 lblTotalStudents.Text = "0";
                 lblTotalAttendance.Text = "0";
                 lblTotalMarks.Text = "0";
+            }
+        }
+
+        // Bell shows announcements posted by this lecturer
+        private void LoadNotifications()
+        {
+            try
+            {
+                using (SqlConnection con = new SqlConnection(connStr))
+                {
+                    con.Open();
+                    string sql = @"SELECT TOP 5 title, datePosted
+                                   FROM Announcements
+                                   WHERE lecturerID = @lid
+                                   ORDER BY datePosted DESC";
+                    SqlCommand cmd = new SqlCommand(sql, con);
+                    cmd.Parameters.AddWithValue("@lid", lecturerID);
+                    SqlDataAdapter da = new SqlDataAdapter(cmd);
+                    DataTable dt = new DataTable();
+                    da.Fill(dt);
+
+                    if (dt.Rows.Count > 0)
+                    {
+                        rptNotifications.DataSource = dt;
+                        rptNotifications.DataBind();
+                        lblNotifCount.Text = dt.Rows.Count.ToString();
+                        pnlNoNotif.Visible = false;
+                    }
+                    else
+                    {
+                        lblNotifCount.Text = "0";
+                        pnlNoNotif.Visible = true;
+                    }
+                }
+            }
+            catch
+            {
+                lblNotifCount.Text = "0";
+                pnlNoNotif.Visible = true;
             }
         }
 

@@ -34,50 +34,44 @@
     <h2 class="logo-text">SIMS</h2>
 </div>
 
-            <!-- SIDEBAR NAVIGATION -->
-            <nav class="sidebar-nav">
+         <!-- SIDEBAR NAVIGATION -->
+<nav class="sidebar-nav">
 
-                <a href="/Admin/AdminDashboard.aspx" 
-                    class="nav-item active">
-                    Dashboard
-                </a>
+    <a href="<%= ResolveUrl("~/Admin/AdminDashboard.aspx") %>" class="nav-item active">
+        Dashboard
+    </a>
 
-                <a href="/Student/StudentDashboard.aspx"
-                   class="nav-item">
-                    Students
-                </a>
+    <!-- FIXED PATH based on image_91611c.png -->
+    <a href="<%= ResolveUrl("~/Management/Student/StudentManagement.aspx") %>" class="nav-item">
+        Students
+    </a>
 
-                <a href="/Lecturer/LecturerDashboard.aspx"
-                   class="nav-item">
-                    Lecturers
-                </a>
+    <!-- Check where LecturerManagement.aspx is. If it's in Management/Lecturer/, use this: -->
+    <a href="<%= ResolveUrl("~/Admin/LecturerManagement.aspx") %>" class="nav-item">
+        Lecturers
+    </a>
 
-                <a href="/Admin/CourseManagement.aspx"
-                   class="nav-item">
-                    Courses
-                </a>
+    <a href="<%= ResolveUrl("~/Admin/CourseManagement.aspx") %>" class="nav-item">
+        Courses
+    </a>
 
-                <a href="/Admin/ProgrammeManagement.aspx"
-                   class="nav-item">
-                    Programmes
-                </a>
+    <a href="<%= ResolveUrl("~/Admin/ProgrammeManagement.aspx") %>" class="nav-item">
+        Programmes
+    </a>
 
-                <a href="/Admin/AssignLecturer.aspx"
-                   class="nav-item">
-                   Assign Lecturer
-                </a>
+    <a href="<%= ResolveUrl("~/Admin/AssignLecturer.aspx") %>" class="nav-item">
+       Assign Lecturer
+    </a>
+
+    <a href="<%= ResolveUrl("~/Admin/Reports.aspx") %>" class="nav-item">
+        Reports
+    </a>
     
+    <a href="<%= ResolveUrl("~/Admin/EnrolmentManagement.aspx") %>" class="nav-item">
+       Enrolments
+   </a>
 
-                <a href="/Admin/Reports.aspx"
-                   class ="nav-item">
-                    Reports
-                    </a>
-                <a href="/Admin/EnrolmentManagement.aspx"
-                   class="nav-item">
-                   Enrolments
-               </a>
-
-            </nav>
+</nav>
 
             <!-- LOGOUT -->
             <div class="sidebar-footer">

@@ -2,12 +2,14 @@
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Web.UI;
 
 namespace SIMS.Lecturer
 {
     public partial class LecturerDashboard : Page
     {
-
+        string connStr = ConfigurationManager.ConnectionStrings["SIMSConnection"].ConnectionString;
+        int lecturerID = 1; // Temporary ID for testing!
 
         protected void Page_Load(object sender, EventArgs e)
         {

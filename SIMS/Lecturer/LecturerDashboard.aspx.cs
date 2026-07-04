@@ -19,6 +19,7 @@ namespace SIMS.Lecturer
                 LoadStats();
                 LoadNotifications();
             }
+        
         }
 
         private void LoadStats()

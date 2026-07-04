@@ -24,6 +24,7 @@ namespace SIMS.Student
             {
                 // Fallback testing harness if Login session data isn't set up yet
                 if (Session["userID"] == null) Session["userID"] = 4;
+                if (Session["studentID"] == null) Session["studentID"] = 1; // Add this line!
 
                 LoadStudentAndProfileID();
                 LoadStudentProfile();

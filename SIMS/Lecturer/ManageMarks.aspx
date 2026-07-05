@@ -110,23 +110,45 @@ tr:hover td{background:#faf9ff;}
     </div>
     <table>
       <thead>
-        <tr><th>No.</th><th>Student Name</th><th>Score (/100)</th><th>Grade</th><th>Remarks</th></tr>
+        <tr>
+          <th>#</th>
+          <th>Student Name</th>
+          <th>Score (/100)</th>
+          <th>Grade</th>
+          <th>Remarks</th>
+        </tr>
       </thead>
       <tbody>
         <asp:Repeater ID="rptMarks" runat="server">
           <ItemTemplate>
             <tr>
               <td><%# Container.ItemIndex + 1 %></td>
-              <td><%# Eval("StudentName") %></td>
-              <td><input type="number" class="mark-input" value="<%# Eval("Marks") %>" min="0" max="100" onchange="updateGrade(this)"/></td>
-             <td><span class="grade <%# Convert.ToDecimal(Eval("Marks")) >= 80 ? "grade-a" : Convert.ToDecimal(Eval("Marks")) >= 70 ? "grade-b" : Convert.ToDecimal(Eval("Marks")) >= 60 ? "grade-c" : "grade-f" %>"><%# Eval("Grade") %></span></td>
-              <td><input type="text" class="remarks-input" value="<%# Eval("Remarks") %>" placeholder="Remarks..."/></td>
+              <td>
+                <%# Eval("StudentName") %>
+                <asp:HiddenField ID="hfStudentID" runat="server" Value='<%# Eval("StudentID") %>'/>
+              </td>
+              <td>
+                <asp:TextBox ID="txtScore" runat="server" 
+                  Text='<%# Eval("Marks") %>' 
+                  CssClass="mark-input" 
+                  onkeyup="updateGrade(this)"/>
+              </td>
+              <td>
+                <asp:Label ID="lblGrade" runat="server" 
+                  Text='<%# Eval("Grade") %>'
+                  CssClass='<%# "grade grade-" + GetGradeClass(Eval("Marks").ToString()) %>'/>
+              </td>
+              <td>
+                <asp:TextBox ID="txtRemarks" runat="server" 
+                  Text='<%# Eval("Remarks") %>' 
+                  CssClass="remarks-input"/>
+              </td>
             </tr>
           </ItemTemplate>
         </asp:Repeater>
       </tbody>
     </table>
-  </div>
+</div>
 </main>
 </form>
 <script>

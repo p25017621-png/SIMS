@@ -49,18 +49,15 @@ namespace SIMS.Lecturer
                     }
                 }
             }
-            catch (Exception ex)
-            {
-                pnlError.Visible = true;
-                lblError.Text = ex.Message;
-            }
+            catch { }
         }
 
         protected void btnPost_Click(object sender, EventArgs e)
         {
             pnlSuccess.Visible = false;
             pnlError.Visible = false;
-            if (string.IsNullOrWhiteSpace(txtTitle.Text) || string.IsNullOrWhiteSpace(txtMessage.Text))
+            if (string.IsNullOrWhiteSpace(txtTitle.Text) ||
+                string.IsNullOrWhiteSpace(txtMessage.Text))
             {
                 pnlError.Visible = true;
                 lblError.Text = "Please fill in both Title and Message!";
@@ -71,7 +68,8 @@ namespace SIMS.Lecturer
                 using (SqlConnection con = new SqlConnection(connStr))
                 {
                     con.Open();
-                    string sql = @"INSERT INTO Announcements (lecturerID, title, message, datePosted)
+                    string sql = @"INSERT INTO Announcements
+                                   (lecturerID, title, message, datePosted)
                                    VALUES (@lid, @title, @msg, CAST(GETDATE() AS DATE))";
                     SqlCommand cmd = new SqlCommand(sql, con);
                     cmd.Parameters.AddWithValue("@lid", lecturerID);
@@ -110,7 +108,7 @@ namespace SIMS.Lecturer
                 catch (Exception ex)
                 {
                     pnlError.Visible = true;
-                    lblError.Text = "Error deleting: " + ex.Message;
+                    lblError.Text = "Error: " + ex.Message;
                 }
             }
         }

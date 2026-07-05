@@ -23,7 +23,7 @@ namespace SIMS.Lecturer
                 using (SqlConnection con = new SqlConnection(connStr))
                 {
                     con.Open();
-                    string sql = @"SELECT u.name, u.email, u.password,
+                    string sql = @"SELECT u.name, u.email,
                                    l.phone, l.department, l.qualification
                                    FROM Lecturers l
                                    JOIN Users u ON l.userID = u.userID
@@ -58,17 +58,21 @@ namespace SIMS.Lecturer
                     con.Open();
 
                     // Update Users table
-                    string sqlU = "UPDATE Users SET name=@name, email=@email WHERE userID=(SELECT userID FROM Lecturers WHERE lecturerID=@lid)";
+                    string sqlU = @"UPDATE Users SET name=@name, email=@email
+                                    WHERE userID=(SELECT userID FROM Lecturers
+                                    WHERE lecturerID=@lid)";
                     SqlCommand cmdU = new SqlCommand(sqlU, con);
                     cmdU.Parameters.AddWithValue("@name", txtName.Text.Trim());
                     cmdU.Parameters.AddWithValue("@email", txtEmail.Text.Trim());
                     cmdU.Parameters.AddWithValue("@lid", lecturerID);
                     cmdU.ExecuteNonQuery();
 
-                    // Update password if provided
+                    // Update password only if not empty
                     if (!string.IsNullOrEmpty(txtPassword.Text))
                     {
-                        string sqlP = "UPDATE Users SET password=@pwd WHERE userID=(SELECT userID FROM Lecturers WHERE lecturerID=@lid)";
+                        string sqlP = @"UPDATE Users SET password=@pwd
+                                        WHERE userID=(SELECT userID FROM Lecturers
+                                        WHERE lecturerID=@lid)";
                         SqlCommand cmdP = new SqlCommand(sqlP, con);
                         cmdP.Parameters.AddWithValue("@pwd", txtPassword.Text);
                         cmdP.Parameters.AddWithValue("@lid", lecturerID);
@@ -76,7 +80,10 @@ namespace SIMS.Lecturer
                     }
 
                     // Update Lecturers table
-                    string sqlL = "UPDATE Lecturers SET phone=@phone, department=@dept, qualification=@qual WHERE lecturerID=@lid";
+                    string sqlL = @"UPDATE Lecturers
+                                    SET phone=@phone, department=@dept,
+                                    qualification=@qual
+                                    WHERE lecturerID=@lid";
                     SqlCommand cmdL = new SqlCommand(sqlL, con);
                     cmdL.Parameters.AddWithValue("@phone", txtPhone.Text.Trim());
                     cmdL.Parameters.AddWithValue("@dept", txtDepartment.Text.Trim());
@@ -84,7 +91,6 @@ namespace SIMS.Lecturer
                     cmdL.Parameters.AddWithValue("@lid", lecturerID);
                     cmdL.ExecuteNonQuery();
                 }
-
                 pnlSuccess.Visible = true;
                 pnlError.Visible = false;
                 LoadProfile();

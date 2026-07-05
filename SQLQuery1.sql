@@ -47,3 +47,6 @@ SELECT * FROM Courses
 SELECT * FROM Enrollments
 SELECT * FROM Attendance
 SELECT * FROM Marks
+
+USE SIMS_DB
+SELECT * FROM Users;

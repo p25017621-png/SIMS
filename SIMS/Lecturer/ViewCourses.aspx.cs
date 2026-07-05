@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.Web.UI;
@@ -10,7 +9,6 @@ namespace SIMS.Lecturer
     {
         string connStr = System.Web.Configuration.WebConfigurationManager
                          .ConnectionStrings["SIMSConnection"].ConnectionString;
-
         int lecturerID = 1;
 
         protected void Page_Load(object sender, EventArgs e)
@@ -22,7 +20,6 @@ namespace SIMS.Lecturer
             }
         }
 
-        // Load assigned courses with real student count from DB
         private void LoadCourses()
         {
             try
@@ -30,19 +27,18 @@ namespace SIMS.Lecturer
                 using (SqlConnection con = new SqlConnection(connStr))
                 {
                     con.Open();
-                    string sql = @"SELECT
-                                   c.courseID,
-                                   c.courseCode,
-                                   c.courseName,
-                                   c.credits AS CreditHours,
-                                   lca.semester AS Semester,
-                                   COUNT(e.studentID) AS StudentCount
-                                   FROM Courses c
-                                   JOIN LecturerCourseAssignments lca ON c.courseID = lca.courseID
-                                   LEFT JOIN Enrolments e ON c.courseID = e.courseID
-                                   WHERE lca.lecturerID = @lid
-                                   GROUP BY c.courseID, c.courseCode, c.courseName,
-                                            c.credits, lca.semester";
+                    string sql = @"
+                        SELECT
+                            c.courseCode,
+                            c.courseName,
+                            c.credits AS CreditHours,
+                            'Semester 1' AS Semester,
+                            COUNT(e.studentID) AS StudentCount
+                        FROM Courses c
+                        LEFT JOIN Enrolments e ON c.courseID = e.courseID
+                        WHERE c.lecturerID = @lid
+                        GROUP BY c.courseID, c.courseCode,
+                                 c.courseName, c.credits";
                     SqlCommand cmd = new SqlCommand(sql, con);
                     cmd.Parameters.AddWithValue("@lid", lecturerID);
                     SqlDataAdapter da = new SqlDataAdapter(cmd);
@@ -55,7 +51,6 @@ namespace SIMS.Lecturer
             catch { }
         }
 
-        // Load registered students from DB
         private void LoadStudents()
         {
             try
@@ -63,20 +58,19 @@ namespace SIMS.Lecturer
                 using (SqlConnection con = new SqlConnection(connStr))
                 {
                     con.Open();
-                    string sql = @"SELECT
-                                   u.name AS Name,
-                                   c.courseName AS Course,
-                                   p.programmeCode AS Program,
-                                   'Active' AS Status,
-                                   'badge-active' AS StatusClass
-                                   FROM Enrolments e
-                                   JOIN Students s ON e.studentID = s.studentID
-                                   JOIN Users u ON s.userID = u.userID
-                                   JOIN Courses c ON e.courseID = c.courseID
-                                   JOIN Programmes p ON e.programmeID = p.programmeID
-                                   JOIN LecturerCourseAssignments lca ON c.courseID = lca.courseID
-                                   WHERE lca.lecturerID = @lid
-                                   ORDER BY c.courseName, u.name";
+                    string sql = @"
+                        SELECT
+                            u.name AS Name,
+                            c.courseName AS Course,
+                            'CS' AS Program,
+                            'Active' AS Status,
+                            'badge-active' AS StatusClass
+                        FROM Enrolments e
+                        JOIN Students s ON e.studentID = s.studentID
+                        JOIN Users u ON s.userID = u.userID
+                        JOIN Courses c ON e.courseID = c.courseID
+                        WHERE c.lecturerID = @lid
+                        ORDER BY c.courseName, u.name";
                     SqlCommand cmd = new SqlCommand(sql, con);
                     cmd.Parameters.AddWithValue("@lid", lecturerID);
                     SqlDataAdapter da = new SqlDataAdapter(cmd);

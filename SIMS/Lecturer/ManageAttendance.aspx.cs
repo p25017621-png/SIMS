@@ -28,10 +28,9 @@ namespace SIMS.Lecturer
                 using (SqlConnection con = new SqlConnection(connStr))
                 {
                     con.Open();
-                    string sql = @"SELECT c.courseID, c.courseName
-                                   FROM Courses c
-                                   JOIN LecturerCourseAssignments lca ON c.courseID = lca.courseID
-                                   WHERE lca.lecturerID = @lid";
+                    string sql = @"SELECT courseID, courseName
+                                   FROM Courses
+                                   WHERE lecturerID = @lid";
                     SqlCommand cmd = new SqlCommand(sql, con);
                     cmd.Parameters.AddWithValue("@lid", lecturerID);
                     SqlDataAdapter da = new SqlDataAdapter(cmd);
@@ -59,10 +58,8 @@ namespace SIMS.Lecturer
             }
             pnlError.Visible = false;
             pnlSuccess.Visible = false;
-
-            string courseName = ddlCourse.SelectedItem.Text;
-            lblCourseName.Text = courseName;
-            lblSelectedCourse.Text = courseName;
+            lblCourseName.Text = ddlCourse.SelectedItem.Text;
+            lblSelectedCourse.Text = ddlCourse.SelectedItem.Text;
 
             int courseID = int.Parse(ddlCourse.SelectedValue);
             LoadTotalStudents(courseID);
@@ -80,8 +77,7 @@ namespace SIMS.Lecturer
                     string sql = "SELECT COUNT(*) FROM Enrolments WHERE courseID = @cid";
                     SqlCommand cmd = new SqlCommand(sql, con);
                     cmd.Parameters.AddWithValue("@cid", courseID);
-                    object r = cmd.ExecuteScalar();
-                    lblTotal.Text = r != null ? r.ToString() : "0";
+                    lblTotal.Text = cmd.ExecuteScalar().ToString();
                 }
             }
             catch { lblTotal.Text = "0"; }
@@ -135,20 +131,6 @@ namespace SIMS.Lecturer
             }
             try
             {
-                // Real DB save — uncomment when ready:
-                // using (SqlConnection con = new SqlConnection(connStr))
-                // {
-                //     con.Open();
-                //     string sql = @"
-                //         IF EXISTS (SELECT 1 FROM Attendance
-                //                    WHERE studentID=@sid AND courseID=@cid AND attendanceDate=@date)
-                //             UPDATE Attendance SET status=@status
-                //             WHERE studentID=@sid AND courseID=@cid AND attendanceDate=@date
-                //         ELSE
-                //             INSERT INTO Attendance (studentID,courseID,attendanceDate,status)
-                //             VALUES (@sid,@cid,@date,@status)";
-                // }
-
                 pnlSuccess.Visible = true;
                 pnlError.Visible = false;
                 lblSuccessMsg.Text = "✅ Attendance for " + ddlCourse.SelectedItem.Text
@@ -184,22 +166,19 @@ namespace SIMS.Lecturer
                         JOIN Users u ON s.userID = u.userID
                         JOIN Enrolments e ON s.studentID = e.studentID
                         JOIN Courses c ON e.courseID = c.courseID
-                        JOIN LecturerCourseAssignments lca ON c.courseID = lca.courseID
                         LEFT JOIN Attendance a ON s.studentID = a.studentID
                             AND a.courseID = c.courseID
-                        WHERE lca.lecturerID = @lid
+                        WHERE c.lecturerID = @lid
                         GROUP BY s.studentID, u.name, c.courseName
                         HAVING ISNULL(CAST(
                             SUM(CASE WHEN a.status='Present' OR a.status='Late' THEN 1 ELSE 0 END)
                             * 100.0 / NULLIF(COUNT(a.attendanceID), 0)
                         AS INT), 0) < 75";
-
                     SqlCommand cmd = new SqlCommand(sql, con);
                     cmd.Parameters.AddWithValue("@lid", lecturerID);
                     SqlDataAdapter da = new SqlDataAdapter(cmd);
                     DataTable dt = new DataTable();
                     da.Fill(dt);
-
                     if (dt.Rows.Count > 0)
                     {
                         rptPoorAttendance.DataSource = dt;

@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.Web.UI;
@@ -10,7 +9,6 @@ namespace SIMS.Lecturer
     {
         string connStr = System.Web.Configuration.WebConfigurationManager
                          .ConnectionStrings["SIMSConnection"].ConnectionString;
-
         int lecturerID = 1;
 
         protected void Page_Load(object sender, EventArgs e)
@@ -22,7 +20,6 @@ namespace SIMS.Lecturer
             }
         }
 
-        // Load stats from DB
         private void LoadStats()
         {
             try
@@ -31,57 +28,53 @@ namespace SIMS.Lecturer
                 {
                     con.Open();
 
-                    // Total students
                     string sqlT = @"SELECT COUNT(DISTINCT e.studentID)
                                     FROM Enrolments e
-                                    JOIN LecturerCourseAssignments lca ON e.courseID = lca.courseID
-                                    WHERE lca.lecturerID = @lid";
+                                    JOIN Courses c ON e.courseID = c.courseID
+                                    WHERE c.lecturerID = @lid";
                     SqlCommand cmdT = new SqlCommand(sqlT, con);
                     cmdT.Parameters.AddWithValue("@lid", lecturerID);
                     lblTotal.Text = cmdT.ExecuteScalar().ToString();
 
-                    // Good — attendance >= 75%
                     string sqlG = @"SELECT COUNT(*) FROM (
                                     SELECT s.studentID,
                                     ISNULL(CAST(SUM(CASE WHEN a.status='Present' OR a.status='Late' THEN 1 ELSE 0 END)
                                     * 100.0 / NULLIF(COUNT(a.attendanceID),0) AS INT),0) AS AttPct
                                     FROM Students s
                                     JOIN Enrolments e ON s.studentID = e.studentID
-                                    JOIN LecturerCourseAssignments lca ON e.courseID = lca.courseID
-                                    LEFT JOIN Attendance a ON s.studentID = a.studentID AND a.courseID = e.courseID
-                                    WHERE lca.lecturerID = @lid
+                                    JOIN Courses c ON e.courseID = c.courseID
+                                    LEFT JOIN Attendance a ON s.studentID = a.studentID AND a.courseID = c.courseID
+                                    WHERE c.lecturerID = @lid
                                     GROUP BY s.studentID
                                     ) AS sub WHERE AttPct >= 75";
                     SqlCommand cmdG = new SqlCommand(sqlG, con);
                     cmdG.Parameters.AddWithValue("@lid", lecturerID);
                     lblGood.Text = cmdG.ExecuteScalar().ToString();
 
-                    // Average — 50 to 74%
                     string sqlA = @"SELECT COUNT(*) FROM (
                                     SELECT s.studentID,
                                     ISNULL(CAST(SUM(CASE WHEN a.status='Present' OR a.status='Late' THEN 1 ELSE 0 END)
                                     * 100.0 / NULLIF(COUNT(a.attendanceID),0) AS INT),0) AS AttPct
                                     FROM Students s
                                     JOIN Enrolments e ON s.studentID = e.studentID
-                                    JOIN LecturerCourseAssignments lca ON e.courseID = lca.courseID
-                                    LEFT JOIN Attendance a ON s.studentID = a.studentID AND a.courseID = e.courseID
-                                    WHERE lca.lecturerID = @lid
+                                    JOIN Courses c ON e.courseID = c.courseID
+                                    LEFT JOIN Attendance a ON s.studentID = a.studentID AND a.courseID = c.courseID
+                                    WHERE c.lecturerID = @lid
                                     GROUP BY s.studentID
                                     ) AS sub WHERE AttPct BETWEEN 50 AND 74";
                     SqlCommand cmdA = new SqlCommand(sqlA, con);
                     cmdA.Parameters.AddWithValue("@lid", lecturerID);
                     lblAvg.Text = cmdA.ExecuteScalar().ToString();
 
-                    // Poor — below 50%
                     string sqlP = @"SELECT COUNT(*) FROM (
                                     SELECT s.studentID,
                                     ISNULL(CAST(SUM(CASE WHEN a.status='Present' OR a.status='Late' THEN 1 ELSE 0 END)
                                     * 100.0 / NULLIF(COUNT(a.attendanceID),0) AS INT),0) AS AttPct
                                     FROM Students s
                                     JOIN Enrolments e ON s.studentID = e.studentID
-                                    JOIN LecturerCourseAssignments lca ON e.courseID = lca.courseID
-                                    LEFT JOIN Attendance a ON s.studentID = a.studentID AND a.courseID = e.courseID
-                                    WHERE lca.lecturerID = @lid
+                                    JOIN Courses c ON e.courseID = c.courseID
+                                    LEFT JOIN Attendance a ON s.studentID = a.studentID AND a.courseID = c.courseID
+                                    WHERE c.lecturerID = @lid
                                     GROUP BY s.studentID
                                     ) AS sub WHERE AttPct < 50";
                     SqlCommand cmdP = new SqlCommand(sqlP, con);
@@ -98,7 +91,6 @@ namespace SIMS.Lecturer
             }
         }
 
-        // Load student progress from DB
         private void LoadStudentProgress()
         {
             try
@@ -117,49 +109,37 @@ namespace SIMS.Lecturer
                             AS INT), 0) AS AttendancePct,
                             ISNULL(CAST(AVG(CAST(m.score AS FLOAT)) AS INT), 0) AS AvgMarks,
                             CASE
-                                WHEN ISNULL(CAST(
-                                    SUM(CASE WHEN a.status='Present' OR a.status='Late' THEN 1 ELSE 0 END)
-                                    * 100.0 / NULLIF(COUNT(a.attendanceID),0) AS INT),0) >= 75
-                                THEN 'Good'
-                                WHEN ISNULL(CAST(
-                                    SUM(CASE WHEN a.status='Present' OR a.status='Late' THEN 1 ELSE 0 END)
-                                    * 100.0 / NULLIF(COUNT(a.attendanceID),0) AS INT),0) >= 50
-                                THEN 'Average'
+                                WHEN ISNULL(CAST(SUM(CASE WHEN a.status='Present' OR a.status='Late' THEN 1 ELSE 0 END)
+                                * 100.0 / NULLIF(COUNT(a.attendanceID),0) AS INT),0) >= 75 THEN 'Good'
+                                WHEN ISNULL(CAST(SUM(CASE WHEN a.status='Present' OR a.status='Late' THEN 1 ELSE 0 END)
+                                * 100.0 / NULLIF(COUNT(a.attendanceID),0) AS INT),0) >= 50 THEN 'Average'
                                 ELSE 'Poor'
                             END AS ProgressStatus,
                             CASE
-                                WHEN ISNULL(CAST(
-                                    SUM(CASE WHEN a.status='Present' OR a.status='Late' THEN 1 ELSE 0 END)
-                                    * 100.0 / NULLIF(COUNT(a.attendanceID),0) AS INT),0) >= 75
-                                THEN 'badge-good'
-                                WHEN ISNULL(CAST(
-                                    SUM(CASE WHEN a.status='Present' OR a.status='Late' THEN 1 ELSE 0 END)
-                                    * 100.0 / NULLIF(COUNT(a.attendanceID),0) AS INT),0) >= 50
-                                THEN 'badge-avg'
+                                WHEN ISNULL(CAST(SUM(CASE WHEN a.status='Present' OR a.status='Late' THEN 1 ELSE 0 END)
+                                * 100.0 / NULLIF(COUNT(a.attendanceID),0) AS INT),0) >= 75 THEN 'badge-good'
+                                WHEN ISNULL(CAST(SUM(CASE WHEN a.status='Present' OR a.status='Late' THEN 1 ELSE 0 END)
+                                * 100.0 / NULLIF(COUNT(a.attendanceID),0) AS INT),0) >= 50 THEN 'badge-avg'
                                 ELSE 'badge-poor'
                             END AS BadgeClass,
                             CASE
-                                WHEN ISNULL(CAST(
-                                    SUM(CASE WHEN a.status='Present' OR a.status='Late' THEN 1 ELSE 0 END)
-                                    * 100.0 / NULLIF(COUNT(a.attendanceID),0) AS INT),0) >= 75
-                                THEN 'fill-green'
-                                WHEN ISNULL(CAST(
-                                    SUM(CASE WHEN a.status='Present' OR a.status='Late' THEN 1 ELSE 0 END)
-                                    * 100.0 / NULLIF(COUNT(a.attendanceID),0) AS INT),0) >= 50
-                                THEN 'fill-yellow'
+                                WHEN ISNULL(CAST(SUM(CASE WHEN a.status='Present' OR a.status='Late' THEN 1 ELSE 0 END)
+                                * 100.0 / NULLIF(COUNT(a.attendanceID),0) AS INT),0) >= 75 THEN 'fill-green'
+                                WHEN ISNULL(CAST(SUM(CASE WHEN a.status='Present' OR a.status='Late' THEN 1 ELSE 0 END)
+                                * 100.0 / NULLIF(COUNT(a.attendanceID),0) AS INT),0) >= 50 THEN 'fill-yellow'
                                 ELSE 'fill-red'
                             END AS FillClass
                         FROM Students s
                         JOIN Users u ON s.userID = u.userID
                         JOIN Enrolments e ON s.studentID = e.studentID
                         JOIN Courses c ON e.courseID = c.courseID
-                        JOIN LecturerCourseAssignments lca ON c.courseID = lca.courseID
-                        LEFT JOIN Attendance a ON s.studentID = a.studentID AND a.courseID = c.courseID
-                        LEFT JOIN Marks m ON s.studentID = m.studentID AND m.courseID = c.courseID
-                        WHERE lca.lecturerID = @lid
+                        LEFT JOIN Attendance a ON s.studentID = a.studentID
+                            AND a.courseID = c.courseID
+                        LEFT JOIN Marks m ON s.studentID = m.studentID
+                            AND m.courseID = c.courseID
+                        WHERE c.lecturerID = @lid
                         GROUP BY s.studentID, u.name, c.courseName
                         ORDER BY AttendancePct ASC";
-
                     SqlCommand cmd = new SqlCommand(sql, con);
                     cmd.Parameters.AddWithValue("@lid", lecturerID);
                     SqlDataAdapter da = new SqlDataAdapter(cmd);

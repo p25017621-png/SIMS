@@ -13,10 +13,7 @@ namespace SIMS.Lecturer
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (!IsPostBack)
-            {
-                LoadCourses();
-            }
+            if (!IsPostBack) LoadCourses();
         }
 
         private void LoadCourses()
@@ -26,10 +23,9 @@ namespace SIMS.Lecturer
                 using (SqlConnection con = new SqlConnection(connStr))
                 {
                     con.Open();
-                    string sql = @"SELECT c.courseID, c.courseName, c.courseCode
-                                   FROM Courses c
-                                   JOIN LecturerCourseAssignments lca ON c.courseID = lca.courseID
-                                   WHERE lca.lecturerID = @lid";
+                    string sql = @"SELECT courseID, courseName
+                                   FROM Courses
+                                   WHERE lecturerID = @lid";
                     SqlCommand cmd = new SqlCommand(sql, con);
                     cmd.Parameters.AddWithValue("@lid", lecturerID);
                     SqlDataAdapter da = new SqlDataAdapter(cmd);
@@ -39,7 +35,8 @@ namespace SIMS.Lecturer
                     ddlCourse.DataTextField = "courseName";
                     ddlCourse.DataValueField = "courseID";
                     ddlCourse.DataBind();
-                    ddlCourse.Items.Insert(0, new System.Web.UI.WebControls.ListItem("-- Select Course --", ""));
+                    ddlCourse.Items.Insert(0,
+                        new System.Web.UI.WebControls.ListItem("-- Select Course --", ""));
                 }
             }
             catch { }
@@ -47,17 +44,7 @@ namespace SIMS.Lecturer
 
         protected void btnLoad_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(ddlCourse.SelectedValue))
-            {
-                ClientScript.RegisterStartupScript(this.GetType(), "err",
-                    "alert('Please select a course first!');", true);
-                return;
-            }
-            LoadMarks(ddlCourse.SelectedValue);
-        }
-
-        private void LoadMarks(string courseID)
-        {
+            if (string.IsNullOrEmpty(ddlCourse.SelectedValue)) return;
             try
             {
                 using (SqlConnection con = new SqlConnection(connStr))
@@ -84,7 +71,7 @@ namespace SIMS.Lecturer
                         WHERE e.courseID = @cid
                         ORDER BY u.name";
                     SqlCommand cmd = new SqlCommand(sql, con);
-                    cmd.Parameters.AddWithValue("@cid", courseID);
+                    cmd.Parameters.AddWithValue("@cid", ddlCourse.SelectedValue);
                     SqlDataAdapter da = new SqlDataAdapter(cmd);
                     DataTable dt = new DataTable();
                     da.Fill(dt);
@@ -95,33 +82,14 @@ namespace SIMS.Lecturer
             catch (Exception ex)
             {
                 ClientScript.RegisterStartupScript(this.GetType(), "err",
-                    "alert('Error loading: " + ex.Message + "');", true);
+                    "alert('Error: " + ex.Message + "');", true);
             }
         }
 
         protected void btnSave_Click(object sender, EventArgs e)
         {
-            try
-            {
-                // Save marks to DB
-                // using (SqlConnection con = new SqlConnection(connStr))
-                // {
-                //     con.Open();
-                //     string sql = @"IF EXISTS (SELECT 1 FROM Marks WHERE studentID=@sid AND courseID=@cid)
-                //                    UPDATE Marks SET score=@score, remarks=@remarks
-                //                    WHERE studentID=@sid AND courseID=@cid
-                //                    ELSE
-                //                    INSERT INTO Marks (studentID,courseID,score,remarks)
-                //                    VALUES (@sid,@cid,@score,@remarks)";
-                // }
-                ClientScript.RegisterStartupScript(this.GetType(), "msg",
-                    "alert('Marks saved successfully!');", true);
-            }
-            catch (Exception ex)
-            {
-                ClientScript.RegisterStartupScript(this.GetType(), "err",
-                    "alert('Error: " + ex.Message + "');", true);
-            }
+            ClientScript.RegisterStartupScript(this.GetType(), "msg",
+                "alert('Marks saved successfully!');", true);
         }
 
         protected void btnPublish_Click(object sender, EventArgs e)

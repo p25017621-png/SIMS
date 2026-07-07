@@ -106,7 +106,7 @@ namespace SIMS.Student
         {
             using (SqlConnection conn = new SqlConnection(connString))
             {
-                string query = @"SELECT c.courseID, c.courseName, c.description, c.credits 
+                string query = @"SELECT c.courseID, c.courseName, c.courseCode, c.credits 
                                  FROM Enrolments e JOIN Courses c ON e.courseID = c.courseID 
                                  WHERE e.studentID = @studentID";
 

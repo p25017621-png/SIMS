@@ -28,29 +28,26 @@ namespace SIMS.Lecturer
                 {
                     con.Open();
 
-                    // Total unique students in lecturer's courses
                     string sql1 = @"SELECT COUNT(DISTINCT e.studentID)
                                     FROM Enrolments e
-                                    JOIN Courses c ON e.courseID = c.courseID
-                                    WHERE c.lecturerID = @lid";
+                                    JOIN LecturerCourseAssignments lca ON e.courseID = lca.courseID
+                                    WHERE lca.lecturerID = @lid";
                     SqlCommand cmd1 = new SqlCommand(sql1, con);
                     cmd1.Parameters.AddWithValue("@lid", lecturerID);
                     lblTotalStudents.Text = cmd1.ExecuteScalar().ToString();
 
-                    // Total attendance records
                     string sql2 = @"SELECT COUNT(*)
                                     FROM Attendance a
-                                    JOIN Courses c ON a.courseID = c.courseID
-                                    WHERE c.lecturerID = @lid";
+                                    JOIN LecturerCourseAssignments lca ON a.courseID = lca.courseID
+                                    WHERE lca.lecturerID = @lid";
                     SqlCommand cmd2 = new SqlCommand(sql2, con);
                     cmd2.Parameters.AddWithValue("@lid", lecturerID);
                     lblTotalAttendance.Text = cmd2.ExecuteScalar().ToString();
 
-                    // Total marks records
                     string sql3 = @"SELECT COUNT(*)
                                     FROM Marks m
-                                    JOIN Courses c ON m.courseID = c.courseID
-                                    WHERE c.lecturerID = @lid";
+                                    JOIN LecturerCourseAssignments lca ON m.courseID = lca.courseID
+                                    WHERE lca.lecturerID = @lid";
                     SqlCommand cmd3 = new SqlCommand(sql3, con);
                     cmd3.Parameters.AddWithValue("@lid", lecturerID);
                     lblTotalMarks.Text = cmd3.ExecuteScalar().ToString();

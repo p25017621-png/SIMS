@@ -137,10 +137,15 @@ tr.hidden-row{display:none;}
   <a href="ViewStudents.aspx" class="nav-item"><i class="fa-solid fa-user-graduate"></i> Students</a>
   <span class="nav-label">Account</span>
   <a href="ManageProfile.aspx" class="nav-item"><i class="fa-solid fa-user-pen"></i> Profile</a>
-  <div class="sidebar-footer">
-    <div class="av">L</div>
-    <div class="user-info"><h4>Lecturer</h4><p>Welcome Back!</p></div>
-  </div>
+ <div class="sidebar-footer" onclick="confirmLogout()" style="cursor:pointer;background:rgba(239,68,68,.15);border:1.5px solid rgba(239,68,68,.3);" onmouseover="this.style.background='rgba(239,68,68,.3)'" onmouseout="this.style.background='rgba(239,68,68,.15)'">
+    <div class="avatar-circle" style="background:#ef4444;">
+        <i class="fa-solid fa-right-from-bracket"></i>
+    </div>
+    <div class="user-info">
+        <h4 style="color:#fca5a5;">Logout</h4>
+        <p style="color:rgba(252,165,165,.7);">Click to sign out</p>
+    </div>
+</div>
 </aside>
 
 <main class="main">
@@ -258,11 +263,10 @@ tr.hidden-row{display:none;}
                   </div>
                 </td>
                 <td>
-                  <div style="font-size:12px;font-weight:600;"><%# Eval("AttPct") %>%</div>
-                  <div class="pb">
-                    <div class="pbf <%# int.Parse(Eval("AttPct").ToString()) >= 75 ? "pg" : int.Parse(Eval("AttPct").ToString()) >= 50 ? "py" : "pr" %>"
-                         style="width:<%# Eval("AttPct") %>%"></div>
-                  </div>
+                <div style="font-size:12px;font-weight:600;"><%# Eval("AttPct") %>%</div>
+<div class="pb">
+    <div class="pbf" style='<%# "width:" + Eval("AttPct") + "%;" %>'></div>
+</div>
                 </td>
                 <td>
                   <div class="att-grp">
@@ -346,8 +350,8 @@ tr.hidden-row{display:none;}
           <div>
             <div style="font-size:12px;font-weight:700;color:#dc2626;"><%# Eval("AttendancePct") %>%</div>
             <div class="att-bar">
-              <div class="att-bar-fill" style="width:<%# Eval("AttendancePct") %>%"></div>
-            </div>
+    <div class="att-bar-fill" style='<%# "width:" + Eval("AttendancePct") + "%;" %>'></div>
+</div>
           </div>
           <div style="font-size:13px;color:#dc2626;font-weight:600;"><%# Eval("Missed") %> classes</div>
           <div><span class="poor-badge"><i class="fa-solid fa-triangle-exclamation"></i> Poor</span></div>
@@ -465,6 +469,13 @@ window.onload = function() {
         if (d && !d.value) d.value = new Date().toISOString().split('T')[0];
         updateLivePanel();
     }
-</script>
+        </script>
+    <script>
+        function confirmLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                window.location.href = '../Login.aspx';
+            }
+        }
+    </script>
 </body>
 </html>

@@ -28,9 +28,10 @@ namespace SIMS.Lecturer
                 using (SqlConnection con = new SqlConnection(connStr))
                 {
                     con.Open();
-                    string sql = @"SELECT courseID, courseName
-                                   FROM Courses
-                                   WHERE lecturerID = @lid";
+                    string sql = @"SELECT c.courseID, c.courseName
+                                   FROM Courses c
+                                   JOIN LecturerCourseAssignments lca ON c.courseID = lca.courseID
+                                   WHERE lca.lecturerID = @lid";
                     SqlCommand cmd = new SqlCommand(sql, con);
                     cmd.Parameters.AddWithValue("@lid", lecturerID);
                     SqlDataAdapter da = new SqlDataAdapter(cmd);
@@ -166,9 +167,10 @@ namespace SIMS.Lecturer
                         JOIN Users u ON s.userID = u.userID
                         JOIN Enrolments e ON s.studentID = e.studentID
                         JOIN Courses c ON e.courseID = c.courseID
+                        JOIN LecturerCourseAssignments lca ON c.courseID = lca.courseID
                         LEFT JOIN Attendance a ON s.studentID = a.studentID
                             AND a.courseID = c.courseID
-                        WHERE c.lecturerID = @lid
+                        WHERE lca.lecturerID = @lid
                         GROUP BY s.studentID, u.name, c.courseName
                         HAVING ISNULL(CAST(
                             SUM(CASE WHEN a.status='Present' OR a.status='Late' THEN 1 ELSE 0 END)

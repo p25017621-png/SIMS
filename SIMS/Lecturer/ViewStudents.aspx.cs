@@ -30,8 +30,8 @@ namespace SIMS.Lecturer
 
                     string sqlT = @"SELECT COUNT(DISTINCT e.studentID)
                                     FROM Enrolments e
-                                    JOIN Courses c ON e.courseID = c.courseID
-                                    WHERE c.lecturerID = @lid";
+                                    JOIN LecturerCourseAssignments lca ON e.courseID = lca.courseID
+                                    WHERE lca.lecturerID = @lid";
                     SqlCommand cmdT = new SqlCommand(sqlT, con);
                     cmdT.Parameters.AddWithValue("@lid", lecturerID);
                     lblTotal.Text = cmdT.ExecuteScalar().ToString();
@@ -42,9 +42,9 @@ namespace SIMS.Lecturer
                                     * 100.0 / NULLIF(COUNT(a.attendanceID),0) AS INT),0) AS AttPct
                                     FROM Students s
                                     JOIN Enrolments e ON s.studentID = e.studentID
-                                    JOIN Courses c ON e.courseID = c.courseID
-                                    LEFT JOIN Attendance a ON s.studentID = a.studentID AND a.courseID = c.courseID
-                                    WHERE c.lecturerID = @lid
+                                    JOIN LecturerCourseAssignments lca ON e.courseID = lca.courseID
+                                    LEFT JOIN Attendance a ON s.studentID = a.studentID AND a.courseID = e.courseID
+                                    WHERE lca.lecturerID = @lid
                                     GROUP BY s.studentID
                                     ) AS sub WHERE AttPct >= 75";
                     SqlCommand cmdG = new SqlCommand(sqlG, con);
@@ -57,9 +57,9 @@ namespace SIMS.Lecturer
                                     * 100.0 / NULLIF(COUNT(a.attendanceID),0) AS INT),0) AS AttPct
                                     FROM Students s
                                     JOIN Enrolments e ON s.studentID = e.studentID
-                                    JOIN Courses c ON e.courseID = c.courseID
-                                    LEFT JOIN Attendance a ON s.studentID = a.studentID AND a.courseID = c.courseID
-                                    WHERE c.lecturerID = @lid
+                                    JOIN LecturerCourseAssignments lca ON e.courseID = lca.courseID
+                                    LEFT JOIN Attendance a ON s.studentID = a.studentID AND a.courseID = e.courseID
+                                    WHERE lca.lecturerID = @lid
                                     GROUP BY s.studentID
                                     ) AS sub WHERE AttPct BETWEEN 50 AND 74";
                     SqlCommand cmdA = new SqlCommand(sqlA, con);
@@ -72,9 +72,9 @@ namespace SIMS.Lecturer
                                     * 100.0 / NULLIF(COUNT(a.attendanceID),0) AS INT),0) AS AttPct
                                     FROM Students s
                                     JOIN Enrolments e ON s.studentID = e.studentID
-                                    JOIN Courses c ON e.courseID = c.courseID
-                                    LEFT JOIN Attendance a ON s.studentID = a.studentID AND a.courseID = c.courseID
-                                    WHERE c.lecturerID = @lid
+                                    JOIN LecturerCourseAssignments lca ON e.courseID = lca.courseID
+                                    LEFT JOIN Attendance a ON s.studentID = a.studentID AND a.courseID = e.courseID
+                                    WHERE lca.lecturerID = @lid
                                     GROUP BY s.studentID
                                     ) AS sub WHERE AttPct < 50";
                     SqlCommand cmdP = new SqlCommand(sqlP, con);
@@ -133,11 +133,10 @@ namespace SIMS.Lecturer
                         JOIN Users u ON s.userID = u.userID
                         JOIN Enrolments e ON s.studentID = e.studentID
                         JOIN Courses c ON e.courseID = c.courseID
-                        LEFT JOIN Attendance a ON s.studentID = a.studentID
-                            AND a.courseID = c.courseID
-                        LEFT JOIN Marks m ON s.studentID = m.studentID
-                            AND m.courseID = c.courseID
-                        WHERE c.lecturerID = @lid
+                        JOIN LecturerCourseAssignments lca ON c.courseID = lca.courseID
+                        LEFT JOIN Attendance a ON s.studentID = a.studentID AND a.courseID = c.courseID
+                        LEFT JOIN Marks m ON s.studentID = m.studentID AND m.courseID = c.courseID
+                        WHERE lca.lecturerID = @lid
                         GROUP BY s.studentID, u.name, c.courseName
                         ORDER BY AttendancePct ASC";
                     SqlCommand cmd = new SqlCommand(sql, con);

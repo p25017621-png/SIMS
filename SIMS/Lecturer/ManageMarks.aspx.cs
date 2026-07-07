@@ -24,9 +24,10 @@ namespace SIMS.Lecturer
                 using (SqlConnection con = new SqlConnection(connStr))
                 {
                     con.Open();
-                    string sql = @"SELECT courseID, courseName
-                                   FROM Courses
-                                   WHERE lecturerID = @lid";
+                    string sql = @"SELECT c.courseID, c.courseName
+                                   FROM Courses c
+                                   JOIN LecturerCourseAssignments lca ON c.courseID = lca.courseID
+                                   WHERE lca.lecturerID = @lid";
                     SqlCommand cmd = new SqlCommand(sql, con);
                     cmd.Parameters.AddWithValue("@lid", lecturerID);
                     SqlDataAdapter da = new SqlDataAdapter(cmd);
@@ -101,8 +102,6 @@ namespace SIMS.Lecturer
                 using (SqlConnection con = new SqlConnection(connStr))
                 {
                     con.Open();
-
-                    // Loop through each row in repeater
                     foreach (RepeaterItem item in rptMarks.Items)
                     {
                         if (item.ItemType == ListItemType.Item ||
@@ -118,15 +117,13 @@ namespace SIMS.Lecturer
                             string remarks = txtRemarks.Text.Trim();
 
                             string sql = @"
-                                IF EXISTS (SELECT 1 FROM Marks 
+                                IF EXISTS (SELECT 1 FROM Marks
                                            WHERE studentID=@sid AND courseID=@cid)
-                                    UPDATE Marks 
-                                    SET score=@score, remarks=@remarks
+                                    UPDATE Marks SET score=@score, remarks=@remarks
                                     WHERE studentID=@sid AND courseID=@cid
                                 ELSE
-                                    INSERT INTO Marks (studentID, courseID, score, remarks)
-                                    VALUES (@sid, @cid, @score, @remarks)";
-
+                                    INSERT INTO Marks (studentID,courseID,score,remarks)
+                                    VALUES (@sid,@cid,@score,@remarks)";
                             SqlCommand cmd = new SqlCommand(sql, con);
                             cmd.Parameters.AddWithValue("@sid", studentID);
                             cmd.Parameters.AddWithValue("@cid", ddlCourse.SelectedValue);
@@ -136,41 +133,22 @@ namespace SIMS.Lecturer
                         }
                     }
                 }
-
-                // Reload marks after save
                 LoadMarks();
-
                 ClientScript.RegisterStartupScript(this.GetType(), "msg",
                     "alert('Marks saved successfully!');", true);
             }
             catch (Exception ex)
             {
                 ClientScript.RegisterStartupScript(this.GetType(), "err",
-                    "alert('Error saving: " + ex.Message + "');", true);
+                    "alert('Error: " + ex.Message + "');", true);
             }
         }
 
         protected void btnPublish_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(ddlCourse.SelectedValue))
-            {
-                ClientScript.RegisterStartupScript(this.GetType(), "err",
-                    "alert('Please select a course first!');", true);
-                return;
-            }
-            try
-            {
-                // Save first then publish
-                btnSave_Click(sender, e);
-
-                ClientScript.RegisterStartupScript(this.GetType(), "pub",
-                    "alert('Marks published successfully! Students can now view their marks.');", true);
-            }
-            catch (Exception ex)
-            {
-                ClientScript.RegisterStartupScript(this.GetType(), "err",
-                    "alert('Error: " + ex.Message + "');", true);
-            }
+            btnSave_Click(sender, e);
+            ClientScript.RegisterStartupScript(this.GetType(), "pub",
+                "alert('Marks published successfully!');", true);
         }
 
         public string GetGradeClass(string marks)

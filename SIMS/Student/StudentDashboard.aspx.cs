@@ -22,27 +22,24 @@ namespace SIMS.Student
 
             if (!IsPostBack)
             {
-                // Fallback testing harness if Login session data isn't set up yet
-                if (Session["userID"] == null) Session["userID"] = 4;
-                if (Session["studentID"] == null) Session["studentID"] = 1; // Add this line!
+                // Verify we have a user context before continuing
+                if (Session["userID"] != null)
+                {
+                    // Enforce state mapping alignment directly from database records
+                    SyncStudentSessionContext();
 
-                LoadStudentAndProfileID();
-                LoadStudentProfile();
-                RefreshDashboardLayout();
+                    LoadStudentProfile();
+                    RefreshDashboardLayout();
+                }
+                else
+                {
+                    Response.Redirect("~/Login.aspx");
+                }
             }
         }
 
-        // Consolidated workflow routine to prevent state tracking mismatch across components
-        private void RefreshDashboardLayout()
-        {
-            LoadEnrolledCourses();
-            LoadAvailableCourses();
-            LoadAttendanceSummary();
-            LoadAcademicMarksAndCalculateMetrics(); // Runs dual binding & safe metric evaluations
-            LoadAnnouncements();
-        }
-
-        private void LoadStudentAndProfileID()
+        // Guarantees Session["studentID"] matches the authentic logged-in User ID record
+        private void SyncStudentSessionContext()
         {
             using (SqlConnection conn = new SqlConnection(connString))
             {
@@ -53,7 +50,7 @@ namespace SIMS.Student
 
                     conn.Open();
                     object result = cmd.ExecuteScalar();
-                    if (result != null)
+                    if (result != null && result != DBNull.Value)
                     {
                         Session["studentID"] = result;
                     }
@@ -61,11 +58,26 @@ namespace SIMS.Student
             }
         }
 
+        private void RefreshDashboardLayout()
+        {
+            // Safeguard to prevent empty queries if state maps are dropped
+            if (Session["studentID"] == null)
+            {
+                SyncStudentSessionContext();
+            }
+
+            LoadEnrolledCourses();
+            LoadAvailableCourses();
+            LoadAttendanceSummary();
+            LoadAcademicMarksAndCalculateMetrics();
+            LoadAnnouncements();
+        }
+
         private void LoadStudentProfile()
         {
             using (SqlConnection conn = new SqlConnection(connString))
             {
-                // Safely pulls the latest enrollment track/term via subqueries to prevent duplicate row aggregation issues
+                // Aligned to use studentID directly to ensure cross-component mapping match
                 string query = @"
                     SELECT u.name, u.email, s.studentID, s.phone, s.address,
                            (SELECT TOP 1 e.semester FROM Enrolments e WHERE e.studentID = s.studentID ORDER BY e.enrolDate DESC) as semester,
@@ -74,11 +86,11 @@ namespace SIMS.Student
                             WHERE e.studentID = s.studentID ORDER BY e.enrolDate DESC) as programmeName
                     FROM Users u 
                     JOIN Students s ON u.userID = s.userID 
-                    WHERE u.userID = @userID";
+                    WHERE s.studentID = @studentID";
 
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
-                    cmd.Parameters.AddWithValue("@userID", Session["userID"]);
+                    cmd.Parameters.AddWithValue("@studentID", Session["studentID"]);
 
                     conn.Open();
                     using (SqlDataReader reader = cmd.ExecuteReader())
@@ -170,7 +182,6 @@ namespace SIMS.Student
 
         protected void btnRegisterCourse_Click(object sender, EventArgs e)
         {
-            // 1. Validasi pilihan course dan semester
             if (string.IsNullOrEmpty(ddlAvailableCourses.SelectedValue)) return;
 
             if (string.IsNullOrEmpty(ddlSemester.SelectedValue))
@@ -185,7 +196,6 @@ namespace SIMS.Student
 
             using (SqlConnection conn = new SqlConnection(connString))
             {
-                // 2. Semakan keselamatan: Elakkan duplicate enrolment untuk subjek yang sama pada semester yang sama
                 string checkQuery = "SELECT COUNT(1) FROM Enrolments WHERE studentID = @studentID AND courseID = @courseID AND semester = @semester";
 
                 conn.Open();
@@ -203,7 +213,6 @@ namespace SIMS.Student
                     }
                 }
 
-                // 3. Insert data baru berserta nilai semester terkini
                 string insertQuery = "INSERT INTO Enrolments (studentID, courseID, semester, enrolDate) VALUES (@studentID, @courseID, @semester, GETDATE())";
                 using (SqlCommand insertCmd = new SqlCommand(insertQuery, conn))
                 {
@@ -215,10 +224,7 @@ namespace SIMS.Student
                 }
 
                 ShowAlert("Enrolled in course successfully!", "green");
-
-                // Reset dropdown semester ke default
                 ddlSemester.SelectedIndex = 0;
-
                 RefreshDashboardLayout();
             }
         }

@@ -1,107 +1,179 @@
 ﻿using System;
 using System.Configuration;
+using System.Data;
 using System.Data.SqlClient;
-using System.Drawing;
+using System.Web.UI;
 using System.Web.UI.WebControls;
 
 namespace SIMS.Admin
 {
     public partial class AdminDashboard : System.Web.UI.Page
     {
+        private string connStr = ConfigurationManager.ConnectionStrings["SIMSConnection"].ConnectionString;
+
         protected void Page_Load(object sender, EventArgs e)
         {
-            // Session Protection
-            if (Session["role"] == null || Session["role"].ToString() != "Admin")
-            {
-                Response.Redirect("~/Login.aspx");
-            }
-
             if (!IsPostBack)
             {
-                LoadDashboardCounts();
+                BindDashboardStats();
+                BindAnnouncements();
             }
         }
 
-        private void LoadDashboardCounts()
+        private void BindDashboardStats()
         {
-            string connStr =
-                ConfigurationManager.ConnectionStrings["SIMSConnection"].ConnectionString;
-
-            using (SqlConnection conn = new SqlConnection(connStr))
+            using (SqlConnection con = new SqlConnection(connStr))
             {
-                conn.Open();
+                string query = @"
+                    SELECT COUNT(*) FROM Students;
+                    SELECT COUNT(*) FROM Lecturers;
+                    SELECT COUNT(*) FROM Courses;
+                    SELECT COUNT(*) FROM Programmes;";
 
-                SqlCommand cmdStudents =
-                    new SqlCommand("SELECT COUNT(*) FROM Students", conn);
-
-                lblStudents.Text =
-                    cmdStudents.ExecuteScalar().ToString();
-
-                SqlCommand cmdLecturers =
-                    new SqlCommand("SELECT COUNT(*) FROM Lecturers", conn);
-
-                lblLecturers.Text =
-                    cmdLecturers.ExecuteScalar().ToString();
-
-                SqlCommand cmdCourses =
-                    new SqlCommand("SELECT COUNT(*) FROM Courses", conn);
-
-                lblCourses.Text =
-                    cmdCourses.ExecuteScalar().ToString();
-
-                SqlCommand cmdProgrammes =
-                    new SqlCommand("SELECT COUNT(*) FROM Programmes", conn);
-
-                lblProgrammes.Text =
-                    cmdProgrammes.ExecuteScalar().ToString();
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    try
+                    {
+                        con.Open();
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            if (reader.Read()) lblStudents.Text = reader[0].ToString();
+                            if (reader.NextResult() && reader.Read()) lblLecturers.Text = reader[0].ToString();
+                            if (reader.NextResult() && reader.Read()) lblCourses.Text = reader[0].ToString();
+                            if (reader.NextResult() && reader.Read()) lblProgrammes.Text = reader[0].ToString();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        lblMsg.Text = "⚠️ Error loading metrics: " + ex.Message;
+                        lblMsg.ForeColor = System.Drawing.Color.Red;
+                    }
+                }
             }
         }
 
-        protected void Calendar1_DayRender(
-            object sender,
-            DayRenderEventArgs e)
+        // ==========================================
+        // ANNOUNCEMENTS LOGIC (UPDATED WITH CASE WHEN)
+        // ==========================================
+        private void BindAnnouncements()
         {
-            DateTime date = e.Day.Date;
-
-            // Semester Registration
-            if (date == new DateTime(2026, 6, 14))
+            using (SqlConnection con = new SqlConnection(connStr))
             {
-                e.Cell.BackColor = Color.FromArgb(99, 102, 241);
-                e.Cell.ForeColor = Color.White;
-                e.Cell.ToolTip = "Semester Registration";
-            }
+                string query = @"SELECT announcementID, title, message, datePosted, lecturerID,
+                                 CASE 
+                                     WHEN lecturerID IS NULL THEN 'Admin' 
+                                     ELSE 'Lecturer' 
+                                 END AS PostedBy
+                                 FROM Announcements 
+                                 ORDER BY datePosted DESC";
 
-            // Midterm Exam
-            if (date == new DateTime(2026, 7, 15))
-            {
-                e.Cell.BackColor = Color.Orange;
-                e.Cell.ForeColor = Color.White;
-                e.Cell.ToolTip = "Midterm Examination";
-            }
-
-            // Project Submission
-            if (date == new DateTime(2026, 8, 20))
-            {
-                e.Cell.BackColor = Color.MediumPurple;
-                e.Cell.ForeColor = Color.White;
-                e.Cell.ToolTip = "Project Submission";
-            }
-
-            // Final Exam
-            if (date == new DateTime(2026, 9, 10))
-            {
-                e.Cell.BackColor = Color.Red;
-                e.Cell.ForeColor = Color.White;
-                e.Cell.ToolTip = "Final Examination";
+                using (SqlDataAdapter da = new SqlDataAdapter(query, con))
+                {
+                    DataTable dt = new DataTable();
+                    da.Fill(dt);
+                    gvAnnouncements.DataSource = dt;
+                    gvAnnouncements.DataBind();
+                }
             }
         }
 
-        protected void btnLogout_Click(object sender, EventArgs e)
+        protected void btnPostAnnouncement_Click(object sender, EventArgs e)
         {
-            Session.Clear();
-            Session.Abandon();
+            if (string.IsNullOrWhiteSpace(txtNewTitle.Text) || string.IsNullOrWhiteSpace(txtNewMessage.Text))
+            {
+                lblMsg.Text = "⚠️ Please fill in both fields!";
+                lblMsg.ForeColor = System.Drawing.Color.Red;
+                return;
+            }
 
-            Response.Redirect("~/Login.aspx");
+            using (SqlConnection con = new SqlConnection(connStr))
+            {
+                // Admins leave lecturerID as NULL automatically
+                string query = "INSERT INTO Announcements (title, message, datePosted) VALUES (@title, @message, @date)";
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    cmd.Parameters.AddWithValue("@title", txtNewTitle.Text.Trim());
+                    cmd.Parameters.AddWithValue("@message", txtNewMessage.Text.Trim());
+                    cmd.Parameters.AddWithValue("@date", DateTime.Now);
+
+                    con.Open();
+                    cmd.ExecuteNonQuery();
+                }
+            }
+
+            txtNewTitle.Text = "";
+            txtNewMessage.Text = "";
+
+            lblMsg.Text = "🚀 Announcement posted successfully!";
+            lblMsg.ForeColor = System.Drawing.Color.Green;
+
+            BindAnnouncements();
+        }
+
+        protected void gvAnnouncements_RowEditing(object sender, GridViewEditEventArgs e)
+        {
+            gvAnnouncements.EditIndex = e.NewEditIndex;
+            BindAnnouncements();
+        }
+
+        protected void gvAnnouncements_RowCancelingEdit(object sender, GridViewCancelEditEventArgs e)
+        {
+            gvAnnouncements.EditIndex = -1;
+            BindAnnouncements();
+        }
+
+        protected void gvAnnouncements_RowUpdating(object sender, GridViewUpdateEventArgs e)
+        {
+            int annID = Convert.ToInt32(gvAnnouncements.DataKeys[e.RowIndex].Value);
+            GridViewRow row = gvAnnouncements.Rows[e.RowIndex];
+
+            TextBox txtTitle = (TextBox)row.FindControl("txtTitle");
+            TextBox txtMessage = (TextBox)row.FindControl("txtMessage");
+
+            if (txtTitle != null && txtMessage != null)
+            {
+                using (SqlConnection con = new SqlConnection(connStr))
+                {
+                    string query = "UPDATE Announcements SET title = @title, message = @message WHERE announcementID = @id";
+                    using (SqlCommand cmd = new SqlCommand(query, con))
+                    {
+                        cmd.Parameters.AddWithValue("@title", txtTitle.Text.Trim());
+                        cmd.Parameters.AddWithValue("@message", txtMessage.Text.Trim());
+                        cmd.Parameters.AddWithValue("@id", annID);
+
+                        con.Open();
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+                lblMsg.Text = "✅ Updated successfully!";
+                lblMsg.ForeColor = System.Drawing.Color.Green;
+                gvAnnouncements.EditIndex = -1;
+                BindAnnouncements();
+            }
+        }
+
+        protected void gvAnnouncements_RowDeleting(object sender, GridViewDeleteEventArgs e)
+        {
+            int annID = Convert.ToInt32(gvAnnouncements.DataKeys[e.RowIndex].Value);
+
+            using (SqlConnection con = new SqlConnection(connStr))
+            {
+                string query = "DELETE FROM Announcements WHERE announcementID = @id";
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    cmd.Parameters.AddWithValue("@id", annID);
+                    con.Open();
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            lblMsg.Text = "🗑️ Announcement removed!";
+            lblMsg.ForeColor = System.Drawing.Color.Green;
+            BindAnnouncements();
+        }
+
+        protected void Calendar1_DayRender(object sender, DayRenderEventArgs e)
+        {
+            // Keeps front-end rendering cleanly
         }
     }
 }

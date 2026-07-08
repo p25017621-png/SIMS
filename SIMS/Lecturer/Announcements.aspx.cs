@@ -24,15 +24,20 @@ namespace SIMS.Lecturer
                 using (SqlConnection con = new SqlConnection(connStr))
                 {
                     con.Open();
-                    string sql = @"SELECT announcementID, title, message, datePosted
+
+                    string sql = @"SELECT announcementID, title, message, datePosted, lecturerID,
+                                   CASE 
+                                       WHEN lecturerID IS NULL THEN 'Admin' 
+                                       ELSE 'Lecturer' 
+                                   END AS PostedBy
                                    FROM Announcements
-                                   WHERE lecturerID = @lid
                                    ORDER BY datePosted DESC";
+
                     SqlCommand cmd = new SqlCommand(sql, con);
-                    cmd.Parameters.AddWithValue("@lid", lecturerID);
                     SqlDataAdapter da = new SqlDataAdapter(cmd);
                     DataTable dt = new DataTable();
                     da.Fill(dt);
+
                     if (dt.Rows.Count > 0)
                     {
                         rptAnnouncements.DataSource = dt;
@@ -56,13 +61,14 @@ namespace SIMS.Lecturer
         {
             pnlSuccess.Visible = false;
             pnlError.Visible = false;
-            if (string.IsNullOrWhiteSpace(txtTitle.Text) ||
-                string.IsNullOrWhiteSpace(txtMessage.Text))
+
+            if (string.IsNullOrWhiteSpace(txtTitle.Text) || string.IsNullOrWhiteSpace(txtMessage.Text))
             {
                 pnlError.Visible = true;
                 lblError.Text = "Please fill in both Title and Message!";
                 return;
             }
+
             try
             {
                 using (SqlConnection con = new SqlConnection(connStr))
@@ -71,12 +77,14 @@ namespace SIMS.Lecturer
                     string sql = @"INSERT INTO Announcements
                                    (lecturerID, title, message, datePosted)
                                    VALUES (@lid, @title, @msg, CAST(GETDATE() AS DATE))";
+
                     SqlCommand cmd = new SqlCommand(sql, con);
                     cmd.Parameters.AddWithValue("@lid", lecturerID);
                     cmd.Parameters.AddWithValue("@title", txtTitle.Text.Trim());
                     cmd.Parameters.AddWithValue("@msg", txtMessage.Text.Trim());
                     cmd.ExecuteNonQuery();
                 }
+
                 pnlSuccess.Visible = true;
                 txtTitle.Text = "";
                 txtMessage.Text = "";

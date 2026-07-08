@@ -15,36 +15,63 @@ namespace SIMS
 
         protected void btnResetPassword_Click(object sender, EventArgs e)
         {
-            // Check Password Match
             if (txtNewPassword.Text != txtConfirmPassword.Text)
             {
+                lblMessage.ForeColor = System.Drawing.Color.Red;
                 lblMessage.Text = "Passwords do not match.";
                 return;
             }
 
-            SqlConnection con = new SqlConnection(cs);
-
-            string query = "UPDATE Users SET password=@password WHERE email=@email";
-
-            SqlCommand cmd = new SqlCommand(query, con);
-
-            cmd.Parameters.AddWithValue("@email", txtEmail.Text.Trim());
-            cmd.Parameters.AddWithValue("@password", txtNewPassword.Text.Trim());
-
-            con.Open();
-
-            int rows = cmd.ExecuteNonQuery();
-
-            con.Close();
-
-            if (rows > 0)
+            using (SqlConnection con = new SqlConnection(cs))
             {
-                lblMessage.ForeColor = System.Drawing.Color.LimeGreen;
-                lblMessage.Text = "Password updated successfully.";
-            }
-            else
-            {
-                lblMessage.Text = "Email not found.";
+                con.Open();
+
+                // Verify Email + Phone Number
+                string verifyQuery = @"
+                SELECT U.userID
+                FROM Users U
+                LEFT JOIN Students S ON U.userID = S.userID
+                LEFT JOIN Lecturers L ON U.userID = L.userID
+                WHERE U.email=@email
+                AND (S.phone=@phone OR L.phone=@phone)";
+
+                SqlCommand verifyCmd = new SqlCommand(verifyQuery, con);
+
+                verifyCmd.Parameters.AddWithValue("@email", txtEmail.Text.Trim());
+                verifyCmd.Parameters.AddWithValue("@phone", txtPhone.Text.Trim());
+
+                object result = verifyCmd.ExecuteScalar();
+
+                if (result == null)
+                {
+                    lblMessage.ForeColor = System.Drawing.Color.Red;
+                    lblMessage.Text = "Invalid email or phone number.";
+                    return;
+                }
+
+                string updateQuery =
+                    "UPDATE Users SET password=@password WHERE userID=@userID";
+
+                SqlCommand updateCmd = new SqlCommand(updateQuery, con);
+
+                updateCmd.Parameters.AddWithValue("@password",
+                    txtNewPassword.Text.Trim());
+
+                updateCmd.Parameters.AddWithValue("@userID",
+                    Convert.ToInt32(result));
+
+                int rows = updateCmd.ExecuteNonQuery();
+
+                if (rows > 0)
+                {
+                    lblMessage.ForeColor = System.Drawing.Color.LimeGreen;
+                    lblMessage.Text = "Password updated successfully.";
+                }
+                else
+                {
+                    lblMessage.ForeColor = System.Drawing.Color.Red;
+                    lblMessage.Text = "Password reset failed.";
+                }
             }
         }
     }

@@ -6,6 +6,9 @@
 
 <head runat="server">
 
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
     <title>Forgot Password</title>
 
     <link href="Assets/CSS/global.css" rel="stylesheet" />
@@ -51,6 +54,22 @@
 
                 </div>
 
+                <!-- PHONE NUMBER -->
+                <div class="form-group">
+
+               <label class="form-label">
+                  Registered Phone Number
+              </label>
+
+                <asp:TextBox
+                ID="txtPhone"
+                runat="server"
+                CssClass="form-input"
+               placeholder="Enter your registered phone number">
+             </asp:TextBox>
+
+              </div>
+
                 <!-- NEW PASSWORD -->
                 <div class="form-group">
 
@@ -58,30 +77,35 @@
                         New Password
                     </label>
 
-                    <asp:TextBox ID="txtNewPassword"
-                        runat="server"
-                        TextMode="Password"
-                        CssClass="form-input"
-                        placeholder="Enter new password">
-                    </asp:TextBox>
+                    <div class="password-wrapper">
 
+                   <asp:TextBox ID="txtNewPassword"
+                     runat="server"
+                     TextMode="Password"
+                     CssClass="form-input"
+                     placeholder="Enter new password">
+                   </asp:TextBox>
+
+               <i class="fa-solid fa-eye eye-icon"
+                onclick="togglePassword('<%= txtNewPassword.ClientID %>', this)">
+              </i>
                 </div>
 
                 <!-- CONFIRM PASSWORD -->
-                <div class="form-group">
+               <div class="password-wrapper">
 
-                    <label class="form-label">
-                        Confirm Password
-                    </label>
+               <asp:TextBox ID="txtConfirmPassword"
+                   runat="server"
+                   TextMode="Password"
+                    CssClass="form-input"
+                    placeholder="Confirm new password">
+                </asp:TextBox>
 
-                    <asp:TextBox ID="txtConfirmPassword"
-                        runat="server"
-                        TextMode="Password"
-                        CssClass="form-input"
-                        placeholder="Confirm new password">
-                    </asp:TextBox>
+               <i class="fa-solid fa-eye eye-icon"
+             onclick="togglePassword('<%= txtConfirmPassword.ClientID %>', this)">
+             </i>
 
-                </div>
+             </div>
 
                 <!-- RESET BUTTON -->
                 <div style="text-align: center; width: 100%;">
@@ -111,6 +135,30 @@
         </div>
 
     </form>
+<script>
 
+function togglePassword(id, icon)
+{
+    var textbox = document.getElementById(id);
+
+    if (textbox.type === "password")
+    {
+        textbox.type = "text";
+
+        icon.classList.remove("fa-eye");
+
+        icon.classList.add("fa-eye-slash");
+    }
+    else
+    {
+        textbox.type = "password";
+
+        icon.classList.remove("fa-eye-slash");
+
+        icon.classList.add("fa-eye");
+    }
+}
+
+</script>
 </body>
 </html>

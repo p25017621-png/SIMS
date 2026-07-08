@@ -56,33 +56,26 @@ namespace SIMS.Lecturer
                 using (SqlConnection con = new SqlConnection(connStr))
                 {
                     con.Open();
-
-                    // Update Users table
                     string sqlU = @"UPDATE Users SET name=@name, email=@email
-                                    WHERE userID=(SELECT userID FROM Lecturers
-                                    WHERE lecturerID=@lid)";
+                                    WHERE userID=(SELECT userID FROM Lecturers WHERE lecturerID=@lid)";
                     SqlCommand cmdU = new SqlCommand(sqlU, con);
                     cmdU.Parameters.AddWithValue("@name", txtName.Text.Trim());
                     cmdU.Parameters.AddWithValue("@email", txtEmail.Text.Trim());
                     cmdU.Parameters.AddWithValue("@lid", lecturerID);
                     cmdU.ExecuteNonQuery();
 
-                    // Update password only if not empty
                     if (!string.IsNullOrEmpty(txtPassword.Text))
                     {
                         string sqlP = @"UPDATE Users SET password=@pwd
-                                        WHERE userID=(SELECT userID FROM Lecturers
-                                        WHERE lecturerID=@lid)";
+                                        WHERE userID=(SELECT userID FROM Lecturers WHERE lecturerID=@lid)";
                         SqlCommand cmdP = new SqlCommand(sqlP, con);
                         cmdP.Parameters.AddWithValue("@pwd", txtPassword.Text);
                         cmdP.Parameters.AddWithValue("@lid", lecturerID);
                         cmdP.ExecuteNonQuery();
                     }
 
-                    // Update Lecturers table
                     string sqlL = @"UPDATE Lecturers
-                                    SET phone=@phone, department=@dept,
-                                    qualification=@qual
+                                    SET phone=@phone, department=@dept, qualification=@qual
                                     WHERE lecturerID=@lid";
                     SqlCommand cmdL = new SqlCommand(sqlL, con);
                     cmdL.Parameters.AddWithValue("@phone", txtPhone.Text.Trim());

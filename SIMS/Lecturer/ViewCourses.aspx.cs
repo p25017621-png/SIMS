@@ -32,13 +32,14 @@ namespace SIMS.Lecturer
                             c.courseCode,
                             c.courseName,
                             c.credits AS CreditHours,
-                            'Semester 1' AS Semester,
+                            lca.semester AS Semester,
                             COUNT(e.studentID) AS StudentCount
                         FROM Courses c
+                        JOIN LecturerCourseAssignments lca ON c.courseID = lca.courseID
                         LEFT JOIN Enrolments e ON c.courseID = e.courseID
-                        WHERE c.lecturerID = @lid
-                        GROUP BY c.courseID, c.courseCode,
-                                 c.courseName, c.credits";
+                        WHERE lca.lecturerID = @lid
+                        GROUP BY c.courseID, c.courseCode, c.courseName,
+                                 c.credits, lca.semester";
                     SqlCommand cmd = new SqlCommand(sql, con);
                     cmd.Parameters.AddWithValue("@lid", lecturerID);
                     SqlDataAdapter da = new SqlDataAdapter(cmd);
@@ -62,14 +63,16 @@ namespace SIMS.Lecturer
                         SELECT
                             u.name AS Name,
                             c.courseName AS Course,
-                            'CS' AS Program,
+                            p.programmeCode AS Program,
                             'Active' AS Status,
                             'badge-active' AS StatusClass
                         FROM Enrolments e
                         JOIN Students s ON e.studentID = s.studentID
                         JOIN Users u ON s.userID = u.userID
                         JOIN Courses c ON e.courseID = c.courseID
-                        WHERE c.lecturerID = @lid
+                        JOIN Programmes p ON e.programmeID = p.programmeID
+                        JOIN LecturerCourseAssignments lca ON c.courseID = lca.courseID
+                        WHERE lca.lecturerID = @lid
                         ORDER BY c.courseName, u.name";
                     SqlCommand cmd = new SqlCommand(sql, con);
                     cmd.Parameters.AddWithValue("@lid", lecturerID);

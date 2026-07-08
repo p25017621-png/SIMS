@@ -76,10 +76,15 @@ tr:hover td{background:#faf9ff;}
   <a href="ViewStudents.aspx" class="nav-item active"><i class="fa-solid fa-user-graduate"></i> Students</a>
   <span class="nav-label">Account</span>
   <a href="ManageProfile.aspx" class="nav-item"><i class="fa-solid fa-user-pen"></i> Profile</a>
-  <div class="sidebar-footer">
-    <div class="avatar-circle">L</div>
-    <div class="user-info"><h4>Lecturer</h4><p>Welcome Back!</p></div>
-  </div>
+ <div class="sidebar-footer" onclick="confirmLogout()" style="cursor:pointer;background:rgba(239,68,68,.15);border:1.5px solid rgba(239,68,68,.3);" onmouseover="this.style.background='rgba(239,68,68,.3)'" onmouseout="this.style.background='rgba(239,68,68,.15)'">
+    <div class="avatar-circle" style="background:#ef4444;">
+        <i class="fa-solid fa-right-from-bracket"></i>
+    </div>
+    <div class="user-info">
+        <h4 style="color:#fca5a5;">Logout</h4>
+        <p style="color:rgba(252,165,165,.7);">Click to sign out</p>
+    </div>
+   </div>
 </aside>
 <main class="main">
   <div class="topbar">
@@ -130,7 +135,7 @@ tr:hover td{background:#faf9ff;}
               <td><div class="student-name"><div class="mini-avatar"><%# Eval("Initial") %></div><%# Eval("Name") %></div></td>
               <td><%# Eval("Course") %></td>
               <td><%# Eval("AttendancePct") %>%
-                <div class="progress-bar"><div class="progress-fill <%# Eval("FillClass") %>" style="width:<%# Eval("AttendancePct") %>%"></div></div>
+               <div class="progress-fill <%# Eval("FillClass") %>" style='<%# "width:" + Eval("AttendancePct") + "%;" %>'></div>
               </td>
               <td><%# Eval("AvgMarks") %></td>
               <td><div class="progress-bar"><div class="progress-fill <%# Eval("FillClass") %>" style="width:<%# Eval("AttendancePct") %>%"></div></div></td>
@@ -151,5 +156,12 @@ tr:hover td{background:#faf9ff;}
         });
     }
 </script>
+    <script>
+        function confirmLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                window.location.href = '../Login.aspx';
+            }
+        }
+    </script>
 </body>
 </html>

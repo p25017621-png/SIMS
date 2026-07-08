@@ -24,6 +24,18 @@ namespace SIMS.Admin
 
                 // Disable course dropdown initially
                 ddlCourse.Enabled = false;
+
+                // Check for state management flags in the URL parameters
+                if (Request.QueryString["status"] == "success")
+                {
+                    lblMessage.Text = "Enrolment added successfully!";
+                    lblMessage.ForeColor = System.Drawing.Color.Green;
+                }
+                else if (Request.QueryString["status"] == "updated")
+                {
+                    lblMessage.Text = "Enrolment record updated successfully!";
+                    lblMessage.ForeColor = System.Drawing.Color.Green;
+                }
             }
         }
 
@@ -164,14 +176,12 @@ namespace SIMS.Admin
                 cmd.Parameters.AddWithValue("@cid", ddlCourse.SelectedValue);
                 cmd.Parameters.AddWithValue("@pid", ddlProgramme.SelectedValue);
                 cmd.Parameters.AddWithValue("@sem", ddlSemester.SelectedValue);
-
                 cmd.ExecuteNonQuery();
-
-                lblMessage.Text = "Enrolment successful!";
-                LoadEnrolments();
+                Response.Redirect(Request.Url.AbsolutePath + "?status=success");
             }
         }
 
+        //delete enrolment
         protected void gvEnrolment_RowDeleting(object sender, System.Web.UI.WebControls.GridViewDeleteEventArgs e)
         {
             int id = Convert.ToInt32(gvEnrolment.DataKeys[e.RowIndex].Value);
@@ -189,6 +199,79 @@ namespace SIMS.Admin
 
                 LoadEnrolments();
             }
+        }
+        // Confirmation for delete and update action
+        protected void gvEnrolment_RowDataBound(object sender, GridViewRowEventArgs e)
+        {
+            // Check if the row is a data row
+            if (e.Row.RowType == DataControlRowType.DataRow)
+            {
+                // Loop through the controls in the last cell (where Edit/Delete/Update/Cancel buttons usually live)
+                foreach (Control control in e.Row.Cells[e.Row.Cells.Count - 1].Controls)
+                {
+                    if (control is LinkButton)
+                    {
+                        LinkButton btn = (LinkButton)control;
+
+                        // Add confirmation to Delete button
+                        if (btn.CommandName == "Delete")
+                        {
+                            btn.Attributes.Add("onclick", "return confirm('Are you sure you want to delete this enrolment?');");
+                        }
+
+                        // Add confirmation to Update button (Save button)
+                        else if (btn.CommandName == "Update")
+                        {
+                            btn.Attributes.Add("onclick", "return confirm('Are you sure you want to save these updates?');");
+                        }
+                    }
+                }
+            }
+        }
+
+        // EDIT 
+        protected void gvEnrolment_RowEditing(object sender, GridViewEditEventArgs e)
+        {
+            gvEnrolment.EditIndex = e.NewEditIndex;
+            LoadEnrolments();
+        }
+
+        // CANCEL EDIT
+        protected void gvEnrolment_RowCancelingEdit(object sender, GridViewCancelEditEventArgs e)
+        {
+            gvEnrolment.EditIndex = -1;
+            LoadEnrolments();
+        }
+
+        // UPDATE 
+        protected void gvEnrolment_RowUpdating(object sender, GridViewUpdateEventArgs e)
+        {
+            // Retrieve enrolmentID record primary key
+            int enrolmentID = Convert.ToInt32(gvEnrolment.DataKeys[e.RowIndex].Value);
+
+            GridViewRow row = gvEnrolment.Rows[e.RowIndex];
+
+            string semester = ((TextBox)row.Cells[3].Controls[0]).Text;
+
+            using (SqlConnection conn = new SqlConnection(cs))
+            {
+                conn.Open();
+
+                // Updating the semester data row
+                string query = "UPDATE Enrolments SET semester=@sem WHERE enrolmentID=@id";
+
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@sem", semester);
+                cmd.Parameters.AddWithValue("@id", enrolmentID);
+
+                cmd.ExecuteNonQuery();
+            }
+
+            // Exit editing mode
+            gvEnrolment.EditIndex = -1;
+
+            // Refresh table and send a clean reload state flag
+            Response.Redirect(Request.Url.AbsolutePath + "?status=updated");
         }
 
         protected void btnClear_Click(object sender, EventArgs e)

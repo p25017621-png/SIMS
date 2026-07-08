@@ -70,42 +70,73 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
 
               </div>
 
-                <!-- NEW PASSWORD -->
-                <div class="form-group">
+               <!-- NEW PASSWORD -->
+<div class="form-group">
 
-                    <label class="form-label">
-                        New Password
-                    </label>
+    <label class="form-label">
+        New Password
+    </label>
 
-                    <div class="password-wrapper">
+    <div class="password-wrapper">
 
-                   <asp:TextBox ID="txtNewPassword"
-                     runat="server"
-                     TextMode="Password"
-                     CssClass="form-input"
-                     placeholder="Enter new password">
-                   </asp:TextBox>
+        <asp:TextBox
+            ID="txtNewPassword"
+            runat="server"
+            TextMode="Password"
+            CssClass="form-input"
+            placeholder="Enter new password">
+        </asp:TextBox>
 
-               <i class="fa-solid fa-eye eye-icon"
-                onclick="togglePassword('<%= txtNewPassword.ClientID %>', this)">
-              </i>
-                </div>
+        <i class="fa-solid fa-eye eye-icon"
+           onclick="togglePassword('<%= txtNewPassword.ClientID %>', this)">
+        </i>
 
-                <!-- CONFIRM PASSWORD -->
-               <div class="password-wrapper">
+    </div>
 
-               <asp:TextBox ID="txtConfirmPassword"
-                   runat="server"
-                   TextMode="Password"
-                    CssClass="form-input"
-                    placeholder="Confirm new password">
-                </asp:TextBox>
+    <asp:RequiredFieldValidator
+        ID="rfvNewPassword"
+        runat="server"
+        ControlToValidate="txtNewPassword"
+        ErrorMessage="New Password is required."
+        ForeColor="Red"
+        Display="Dynamic">
+    </asp:RequiredFieldValidator>
 
-               <i class="fa-solid fa-eye eye-icon"
-             onclick="togglePassword('<%= txtConfirmPassword.ClientID %>', this)">
-             </i>
+</div>
 
-             </div>
+               <!-- CONFIRM PASSWORD -->
+<div class="form-group">
+
+    <label class="form-label">
+        Confirm Password
+    </label>
+
+    <div class="password-wrapper">
+
+        <asp:TextBox
+            ID="txtConfirmPassword"
+            runat="server"
+            TextMode="Password"
+            CssClass="form-input"
+            placeholder="Confirm new password">
+        </asp:TextBox>
+
+        <i class="fa-solid fa-eye eye-icon"
+           onclick="togglePassword('<%= txtConfirmPassword.ClientID %>', this)">
+        </i>
+
+    </div>
+
+    <asp:RequiredFieldValidator
+        ID="rfvConfirmPassword"
+        runat="server"
+        ControlToValidate="txtConfirmPassword"
+        ErrorMessage="Confirm Password is required."
+        ForeColor="Red"
+        Display="Dynamic">
+    </asp:RequiredFieldValidator>
+
+</div>
 
                 <!-- RESET BUTTON -->
                 <div style="text-align: center; width: 100%;">

@@ -54,7 +54,8 @@ OnClick="btnClear_Click" />
     OnRowEditing="gvPrograms_RowEditing"
     OnRowUpdating="gvPrograms_RowUpdating"
     OnRowCancelingEdit="gvPrograms_RowCancelingEdit"
-    OnRowDeleting="gvPrograms_RowDeleting">
+    OnRowDeleting="gvPrograms_RowDeleting"
+    OnRowDataBound="gvPrograms_RowDataBound">
 
     <Columns>
 

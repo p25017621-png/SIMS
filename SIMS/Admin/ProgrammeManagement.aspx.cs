@@ -81,6 +81,34 @@ namespace SIMS.Admin
 
             LoadPrograms();
         }
+        // Confirmation for delete and update action
+        protected void gvPrograms_RowDataBound(object sender, GridViewRowEventArgs e)
+        {
+            // Check if the row is a data row
+            if (e.Row.RowType == DataControlRowType.DataRow)
+            {
+                // Loop through the controls in the last cell (where Edit/Delete/Update/Cancel buttons usually live)
+                foreach (Control control in e.Row.Cells[e.Row.Cells.Count - 1].Controls)
+                {
+                    if (control is LinkButton)
+                    {
+                        LinkButton btn = (LinkButton)control;
+
+                        // Add confirmation to Delete button
+                        if (btn.CommandName == "Delete")
+                        {
+                            btn.Attributes.Add("onclick", "return confirm('Are you sure you want to delete this programme?');");
+                        }
+
+                        // Add confirmation to Update button (Save button)
+                        else if (btn.CommandName == "Update")
+                        {
+                            btn.Attributes.Add("onclick", "return confirm('Are you sure you want to save these updates?');");
+                        }
+                    }
+                }
+            }
+        }
 
         protected void btnClear_Click(object sender, EventArgs e)
         {

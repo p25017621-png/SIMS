@@ -73,7 +73,8 @@ DataKeyNames="lecturerID"
 OnRowEditing="gvLecturers_RowEditing"
 OnRowCancelingEdit="gvLecturers_RowCancelingEdit"
 OnRowUpdating="gvLecturers_RowUpdating"
-OnRowDeleting="gvLecturers_RowDeleting">
+OnRowDeleting="gvLecturers_RowDeleting"
+OnRowDataBound="gvLecturers_RowDataBound"> 
 
 <Columns>
 

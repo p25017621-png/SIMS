@@ -13,8 +13,15 @@ namespace SIMS
         {
         }
 
+
         protected void btnLogin_Click(object sender, EventArgs e)
+
         {
+            if (!Page.IsValid)
+            {
+                return;
+            }
+
             // Set up variables to hold state outside the database reader scope
             bool isAuthenticated = false;
             string targetRole = string.Empty;

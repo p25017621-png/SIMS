@@ -97,7 +97,11 @@ runat="server">
     GridLines="None"
     AutoGenerateColumns="false"
     DataKeyNames="enrolmentID"
-    OnRowDeleting="gvEnrolment_RowDeleting">
+    OnRowEditing="gvEnrolment_RowEditing"
+    OnRowCancelingEdit="gvEnrolment_RowCancelingEdit"
+    OnRowUpdating="gvEnrolment_RowUpdating"
+    OnRowDeleting="gvEnrolment_RowDeleting"
+    OnRowDataBound="gvEnrolment_RowDataBound">
 
         <Columns>
             <asp:BoundField DataField="studentName" HeaderText="Student" />
@@ -108,6 +112,7 @@ runat="server">
 
             <asp:CommandField
                HeaderText="Action"
+               ShowEditButton="True"
                ShowDeleteButton="true" />
 
         </Columns>

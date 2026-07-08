@@ -115,7 +115,8 @@
                 OnRowEditing="gvStudents_RowEditing"
                 OnRowCancelingEdit="gvStudents_RowCancelingEdit"
                 OnRowUpdating="gvStudents_RowUpdating"
-                OnRowDeleting="gvStudents_RowDeleting">
+                OnRowDeleting="gvStudents_RowDeleting"
+                OnRowDataBound="gvStudents_RowDataBound">
 
                 <Columns>
 

@@ -2,6 +2,8 @@
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Drawing;
+using System.Web.UI;
 using System.Web.UI.WebControls;
 
 namespace SIMS.Admin
@@ -15,6 +17,13 @@ namespace SIMS.Admin
             if (!IsPostBack)
             {
                 LoadLecturers();
+
+                // Check if we just redirected here after a successful save
+                if (Request.QueryString["status"] == "success")
+                {
+                    lblMessage.Text = "Lecturer Added Successfully!";
+                    lblMessage.ForeColor = System.Drawing.Color.Green;
+                }
             }
         }
 
@@ -79,7 +88,12 @@ namespace SIMS.Admin
                 lblMessage.Text = "Lecturer Added Successfully!";
 
                 LoadLecturers();
+
+
+                // Redirect back to this page but attach a success flag to the URL string
+                Response.Redirect(Request.Url.AbsolutePath + "?status=success");
             }
+
         }
 
         protected void gvLecturers_RowEditing(object sender, GridViewEditEventArgs e)
@@ -157,7 +171,7 @@ WHERE lecturerID=@lecturerID";
             lblMessage.Text =
                 "Lecturer Updated Successfully!";
         }
-
+        //delete lecturer
         protected void gvLecturers_RowDeleting(object sender, GridViewDeleteEventArgs e)
         {
             int lecturerID =
@@ -205,6 +219,35 @@ WHERE lecturerID=@lecturerID";
 
             lblMessage.Text =
                 "Lecturer Deleted Successfully!";
+        }
+
+        // Confirmation for delete and update action
+        protected void gvLecturers_RowDataBound(object sender, GridViewRowEventArgs e)
+        {
+            // Check if the row is a data row
+            if (e.Row.RowType == DataControlRowType.DataRow)
+            {
+                // Loop through the controls in the last cell (where Edit/Delete/Update/Cancel buttons usually live)
+                foreach (Control control in e.Row.Cells[e.Row.Cells.Count - 1].Controls)
+                {
+                    if (control is LinkButton)
+                    {
+                        LinkButton btn = (LinkButton)control;
+
+                        // Add confirmation to Delete button
+                        if (btn.CommandName == "Delete")
+                        {
+                            btn.Attributes.Add("onclick", "return confirm('Are you sure you want to delete this lecturer?');");
+                        }
+
+                        // Add confirmation to Update button (Save button)
+                        else if (btn.CommandName == "Update")
+                        {
+                            btn.Attributes.Add("onclick", "return confirm('Are you sure you want to save these updates?');");
+                        }
+                    }
+                }
+            }
         }
 
         protected void btnClear_Click(object sender, EventArgs e)

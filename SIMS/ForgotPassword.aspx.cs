@@ -15,6 +15,44 @@ namespace SIMS
 
         protected void btnResetPassword_Click(object sender, EventArgs e)
         {
+            lblMessage.Text = "";
+
+            // ==========================
+            // STEP 1 - EMPTY FIELD CHECK
+            // ==========================
+
+            if (string.IsNullOrWhiteSpace(txtEmail.Text))
+            {
+                lblMessage.ForeColor = System.Drawing.Color.Red;
+                lblMessage.Text = "Email is required.";
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(txtPhone.Text))
+            {
+                lblMessage.ForeColor = System.Drawing.Color.Red;
+                lblMessage.Text = "Registered phone number is required.";
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(txtNewPassword.Text))
+            {
+                lblMessage.ForeColor = System.Drawing.Color.Red;
+                lblMessage.Text = "New password is required.";
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(txtConfirmPassword.Text))
+            {
+                lblMessage.ForeColor = System.Drawing.Color.Red;
+                lblMessage.Text = "Please confirm your new password.";
+                return;
+            }
+
+            // ==========================
+            // STEP 2 - PASSWORD MATCH
+            // ==========================
+
             if (txtNewPassword.Text != txtConfirmPassword.Text)
             {
                 lblMessage.ForeColor = System.Drawing.Color.Red;
@@ -26,7 +64,10 @@ namespace SIMS
             {
                 con.Open();
 
-                // Verify Email + Phone Number
+                // ====================================
+                // STEP 3 - VERIFY EMAIL + PHONE NUMBER
+                // ====================================
+
                 string verifyQuery = @"
                 SELECT U.userID
                 FROM Users U
@@ -45,20 +86,41 @@ namespace SIMS
                 if (result == null)
                 {
                     lblMessage.ForeColor = System.Drawing.Color.Red;
-                    lblMessage.Text = "Invalid email or phone number.";
+                    lblMessage.Text = "Invalid email or registered phone number.";
                     return;
                 }
+
+                // ====================================
+                // STEP 4 - CHECK CURRENT PASSWORD
+                // ====================================
+
+                string currentPasswordQuery =
+                    "SELECT password FROM Users WHERE userID=@userID";
+
+                SqlCommand currentCmd = new SqlCommand(currentPasswordQuery, con);
+
+                currentCmd.Parameters.AddWithValue("@userID", Convert.ToInt32(result));
+
+                string currentPassword = currentCmd.ExecuteScalar().ToString();
+
+                if (currentPassword == txtNewPassword.Text.Trim())
+                {
+                    lblMessage.ForeColor = System.Drawing.Color.Red;
+                    lblMessage.Text = "New password cannot be the same as the current password.";
+                    return;
+                }
+
+                // ====================================
+                // STEP 5 - UPDATE PASSWORD
+                // ====================================
 
                 string updateQuery =
                     "UPDATE Users SET password=@password WHERE userID=@userID";
 
                 SqlCommand updateCmd = new SqlCommand(updateQuery, con);
 
-                updateCmd.Parameters.AddWithValue("@password",
-                    txtNewPassword.Text.Trim());
-
-                updateCmd.Parameters.AddWithValue("@userID",
-                    Convert.ToInt32(result));
+                updateCmd.Parameters.AddWithValue("@password", txtNewPassword.Text.Trim());
+                updateCmd.Parameters.AddWithValue("@userID", Convert.ToInt32(result));
 
                 int rows = updateCmd.ExecuteNonQuery();
 
@@ -66,6 +128,10 @@ namespace SIMS
                 {
                     lblMessage.ForeColor = System.Drawing.Color.LimeGreen;
                     lblMessage.Text = "Password updated successfully.";
+
+                    // Optional: Clear password fields
+                    txtNewPassword.Text = "";
+                    txtConfirmPassword.Text = "";
                 }
                 else
                 {

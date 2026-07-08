@@ -40,35 +40,55 @@
                 </p>
 
                 <!-- Email -->
-                <div class="form-group">
+<div class="form-group">
 
-                    <label class="form-label">
-                        Email Address
-                    </label>
+    <label class="form-label">
+        Email Address
+    </label>
 
-                    <asp:TextBox ID="txtEmail"
-                        runat="server"
-                        CssClass="form-input"
-                        placeholder="Enter your email">
-                    </asp:TextBox>
+    <asp:TextBox
+        ID="txtEmail"
+        runat="server"
+        CssClass="form-input"
+        placeholder="Enter your email">
+    </asp:TextBox>
 
-                </div>
+    <asp:RequiredFieldValidator
+        ID="rfvEmail"
+        runat="server"
+        ControlToValidate="txtEmail"
+        ErrorMessage="Email is required."
+        ForeColor="Red"
+        Display="Dynamic">
+    </asp:RequiredFieldValidator>
+
+</div>
 
                 <!-- Password -->
-                <div class="form-group">
+<div class="form-group">
 
-                    <label class="form-label">
-                        Password
-                    </label>
+    <label class="form-label">
+        Password
+    </label>
 
-                    <asp:TextBox ID="txtPassword"
-                        runat="server"
-                        TextMode="Password"
-                        CssClass="form-input"
-                        placeholder="Enter your password">
-                    </asp:TextBox>
+    <asp:TextBox
+        ID="txtPassword"
+        runat="server"
+        TextMode="Password"
+        CssClass="form-input"
+        placeholder="Enter your password">
+    </asp:TextBox>
 
-                </div>
+    <asp:RequiredFieldValidator
+        ID="rfvPassword"
+        runat="server"
+        ControlToValidate="txtPassword"
+        ErrorMessage="Password is required."
+        ForeColor="Red"
+        Display="Dynamic">
+    </asp:RequiredFieldValidator>
+
+</div>
 
                 <!-- Login Button -->
                 <div style="text-align: center; width: 100%;">

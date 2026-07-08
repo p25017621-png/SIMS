@@ -81,7 +81,8 @@ GridLines="None"
 OnRowEditing="gvAssign_RowEditing"
 OnRowCancelingEdit="gvAssign_RowCancelingEdit"
 OnRowUpdating="gvAssign_RowUpdating"
-OnRowDeleting="gvAssign_RowDeleting">
+OnRowDeleting="gvAssign_RowDeleting"
+OnRowDataBound="gvAssign_RowDataBound">
 
 
        <Columns>

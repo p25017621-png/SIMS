@@ -177,41 +177,45 @@ namespace SIMS.Management.Student
         // DELETE STUDENT
         protected void gvStudents_RowDeleting(object sender, GridViewDeleteEventArgs e)
         {
-            int userID =
-                Convert.ToInt32(gvStudents.DataKeys[e.RowIndex].Value);
+            int userID = Convert.ToInt32(gvStudents.DataKeys[e.RowIndex].Value);
 
-            SqlConnection con =
-                new SqlConnection(connectionString);
+            using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                con.Open();
 
-            con.Open();
+                // 1. Get the studentID first using the userID
+                string getStudentQuery = "SELECT studentID FROM Students WHERE userID=@userID";
+                int studentID = 0;
 
-            // Get studentID
-            string getStudentQuery =
-                "SELECT studentID FROM Students WHERE userID=@userID";
+                using (SqlCommand getCmd = new SqlCommand(getStudentQuery, con))
+                {
+                    getCmd.Parameters.AddWithValue("@userID", userID);
+                    object result = getCmd.ExecuteScalar();
+                    if (result != null && result != DBNull.Value)
+                    {
+                        studentID = Convert.ToInt32(result);
+                    }
+                }
 
-            SqlCommand getCmd =
-                new SqlCommand(getStudentQuery, con);
+                // 2. Clear out all relational child records in the correct order before dropping the core entities
+                string deleteQuery = @"
+            DELETE FROM Marks WHERE studentID=@studentID;
+            DELETE FROM Attendance WHERE studentID=@studentID;
+            DELETE FROM Enrolments WHERE studentID=@studentID;
+            DELETE FROM Students WHERE studentID=@studentID;
+            DELETE FROM Users WHERE userID=@userID;";
 
-            getCmd.Parameters.AddWithValue("@userID", userID);
+                using (SqlCommand cmd = new SqlCommand(deleteQuery, con))
+                {
+                    cmd.Parameters.AddWithValue("@studentID", studentID);
+                    cmd.Parameters.AddWithValue("@userID", userID);
 
-            int studentID =
-                Convert.ToInt32(getCmd.ExecuteScalar());
+                    cmd.ExecuteNonQuery();
+                }
+            }
 
-            // Delete enrolments first
-            string deleteQuery =
-                "DELETE FROM Enrolments WHERE studentID=@studentID;" +
-                "DELETE FROM Students WHERE studentID=@studentID;" +
-                "DELETE FROM Users WHERE userID=@userID;";
-
-            SqlCommand cmd =
-                new SqlCommand(deleteQuery, con);
-
-            cmd.Parameters.AddWithValue("@studentID", studentID);
-            cmd.Parameters.AddWithValue("@userID", userID);
-
-            cmd.ExecuteNonQuery();
-
-            con.Close();
+            lblMessage.Text = "🗑️ Student and all associated records removed successfully!";
+            lblMessage.ForeColor = System.Drawing.Color.Green;
 
             LoadStudents();
         }

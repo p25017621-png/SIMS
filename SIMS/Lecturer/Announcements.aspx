@@ -57,12 +57,17 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
 .ann-item:hover{background:#faf9ff;}
 .ann-item:last-child{border-bottom:none;}
 .ann-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px;}
-.ann-meta{font-size:11px;color:var(--muted);margin-bottom:6px;}
+.ann-meta{font-size:11px;color:var(--muted);margin-bottom:6px;display:flex;align-items:center;gap:10px;}
 .ann-body{font-size:13px;color:var(--muted);line-height:1.5;}
-.ann-actions{display:flex;gap:8px;margin-top:8px;}
-.btn-del{background:#fee2e2;color:#dc2626;border:none;padding:5px 12px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.ann-actions{display:flex;gap:8px;margin-top:10px;}
+.btn-del{background:#fee2e2;color:#dc2626;border:none;padding:5px 12px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:none;display:inline-flex;align-items:center;gap:4px;}
 .btn-del:hover{background:#dc2626;color:#fff;}
 .empty-state{padding:40px;text-align:center;color:var(--muted);font-size:13px;}
+
+/* Custom badge styling for author type verification */
+.author-badge {padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700;text-transform:uppercase;display:inline-flex;align-items:center;gap:4px;}
+.badge-admin {background:#ede9fe;color:#6c4ef2;}
+.badge-lecturer {background:#e0f2fe;color:#0369a1;}
 </style>
 </head>
 <body>
@@ -129,10 +134,23 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);dis
         <ItemTemplate>
           <div class="ann-item">
             <div class="ann-title"><%# Eval("title") %></div>
-            <div class="ann-meta"><i class="fa-regular fa-clock"></i> <%# Convert.ToDateTime(Eval("datePosted")).ToString("dd MMM yyyy") %></div>
+            <div class="ann-meta">
+              <span><i class="fa-regular fa-clock"></i> <%# Convert.ToDateTime(Eval("datePosted")).ToString("dd MMM yyyy") %></span>
+              
+              <!-- FIXED: The class and inner structures evaluate safely directly within server blocks to prevent exception drops -->
+              <span class='<%# "author-badge badge-" + Eval("PostedBy").ToString().ToLower() %>'>
+                <i class='<%# Eval("PostedBy").ToString() == "Admin" ? "fa-solid fa-user-shield" : "fa-solid fa-chalkboard-user" %>'></i> 
+                <%# Eval("PostedBy") %>
+              </span>
+            </div>
             <div class="ann-body"><%# Eval("message") %></div>
             <div class="ann-actions">
-              <asp:LinkButton ID="btnDelete" runat="server" CommandName="DeleteAnn" CommandArgument='<%# Eval("announcementID") %>' CssClass="btn-del" OnClientClick="return confirm('Delete this announcement?');"><i class="fa-solid fa-trash"></i> Delete</asp:LinkButton>
+              <asp:LinkButton ID="btnDelete" runat="server" CommandName="DeleteAnn" 
+                CommandArgument='<%# Eval("announcementID") %>' 
+                Visible='<%# Eval("PostedBy").ToString() == "Lecturer" %>'
+                CssClass="btn-del" OnClientClick="return confirm('Delete this announcement?');">
+                <i class="fa-solid fa-trash"></i> Delete
+              </asp:LinkButton>
             </div>
           </div>
         </ItemTemplate>

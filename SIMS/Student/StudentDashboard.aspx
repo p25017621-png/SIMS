@@ -171,7 +171,7 @@
                                 <RowStyle Height="50px" ForeColor="#334155" BorderColor="#f1f5f9" BorderWidth="1px" BorderStyle="Solid" Font-Size="13px" />
                                 <Columns>
                                     <asp:BoundField DataField="courseName" HeaderText="Course Name" ItemStyle-Font-Bold="true" HeaderStyle-HorizontalAlign="Left" ItemStyle-HorizontalAlign="Left" />
-                                    <asp:BoundField DataField="description" HeaderText="Description" HeaderStyle-HorizontalAlign="Left" ItemStyle-HorizontalAlign="Left" />
+                                    <asp:BoundField DataField="courseCode" HeaderText="Course Code" HeaderStyle-HorizontalAlign="Left" ItemStyle-HorizontalAlign="Left" />
                                     <asp:BoundField DataField="credits" HeaderText="Credits" HeaderStyle-HorizontalAlign="Center" ItemStyle-HorizontalAlign="Center" HeaderStyle-Width="90px" />
                                     <asp:TemplateField HeaderText="Action" HeaderStyle-HorizontalAlign="Center" ItemStyle-HorizontalAlign="Center" HeaderStyle-Width="100px">
                                         <ItemTemplate>

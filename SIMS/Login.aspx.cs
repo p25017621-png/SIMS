@@ -7,67 +7,70 @@ namespace SIMS
     public partial class Login : System.Web.UI.Page
     {
         // Database Connection String
-        string cs = ConfigurationManager.ConnectionStrings["SIMSConnection"].ConnectionString;
+        private readonly string cs = ConfigurationManager.ConnectionStrings["SIMSConnection"].ConnectionString;
 
         protected void Page_Load(object sender, EventArgs e)
         {
-
         }
 
         protected void btnLogin_Click(object sender, EventArgs e)
         {
-            // Create SQL Connection
-            SqlConnection con = new SqlConnection(cs);
+            // Set up variables to hold state outside the database reader scope
+            bool isAuthenticated = false;
+            string targetRole = string.Empty;
+            string userEmail = string.Empty;
+            string userID = string.Empty;
 
-            // SQL Query
-            string query = "SELECT * FROM Users WHERE email=@email AND password=@password";
+            string query = "SELECT userID, email, role FROM Users WHERE email=@email AND password=@password";
 
-            // SQL Command
-            SqlCommand cmd = new SqlCommand(query, con);
-
-            // Parameters
-            cmd.Parameters.AddWithValue("@email", txtEmail.Text.Trim());
-            cmd.Parameters.AddWithValue("@password", txtPassword.Text.Trim());
-
-            // Open Connection
-            con.Open();
-
-            // Execute Reader
-            SqlDataReader reader = cmd.ExecuteReader();
-
-            // Check Login
-            if (reader.HasRows)
+            using (SqlConnection con = new SqlConnection(cs))
             {
-                while (reader.Read())
+                using (SqlCommand cmd = new SqlCommand(query, con))
                 {
-                    string role = reader["role"].ToString();
+                    cmd.Parameters.AddWithValue("@email", txtEmail.Text.Trim());
+                    cmd.Parameters.AddWithValue("@password", txtPassword.Text.Trim());
 
-                    // Store Session
-                    Session["email"] = reader["email"].ToString();
-                    Session["role"] = role;
+                    con.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            isAuthenticated = true;
+                            userID = reader["userID"].ToString();
+                            userEmail = reader["email"].ToString();
+                            targetRole = reader["role"].ToString();
+                        }
+                    }
+                }
+            }
 
-                    // Redirect Based On Role
-                    if (role == "Admin")
-                    {
-                        Response.Redirect("Admin/AdminDashboard.aspx");
-                    }
-                    else if (role == "Lecturer")
-                    {
-                        Response.Redirect("Lecturer/LecturerDashboard.aspx");
-                    }
-                    else if (role == "Student")
-                    {
-                        Response.Redirect("Student/StudentDashboard.aspx");
-                    }
+            if (isAuthenticated)
+            {
+                Session["userID"] = userID;
+                Session["email"] = userEmail;
+                Session["role"] = targetRole;
+
+                if (targetRole == "Admin")
+                {
+                    Response.Redirect("Admin/AdminDashboard.aspx");
+                }
+                else if (targetRole == "Lecturer")
+                {
+                    Response.Redirect("Lecturer/LecturerDashboard.aspx");
+                }
+                else if (targetRole == "Student")
+                {
+                    Response.Redirect("Student/StudentDashboard.aspx");
+                }
+                else
+                {
+                    lblMessage.Text = "Account role not recognized.";
                 }
             }
             else
             {
                 lblMessage.Text = "Invalid Email or Password";
             }
-
-            // Close Connection
-            con.Close();
         }
     }
 }
